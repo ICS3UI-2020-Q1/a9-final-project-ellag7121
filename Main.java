@@ -42,15 +42,21 @@ public class Main implements Runnable, ActionListener{
     mapDisplay = new JTextArea();
 
     //set up component locations
-    outputField.setBounds(10,10,780,285);
     inputField.setBounds(10,305,385,20);
-    inventoryDisplay.setBounds(10,335,187,255);
-    statDisplay.setBounds(208,335,187,255);
-    mapDisplay.setBounds(405,305,385,285);
+    outputField.setBounds(10,10,780,285);
+    inventoryDisplay.setBounds(10,335,187,245);
+    statDisplay.setBounds(208,335,187,245);
+    mapDisplay.setBounds(405,305,385,275);
+
+    //disable the text areas
+    outputField.setEnabled(false);
+    inventoryDisplay.setEnabled(false);
+    statDisplay.setEnabled(false);
+    mapDisplay.setEnabled(false);
 
     //add components to the main panel
-    mainPanel.add(outputField);
     mainPanel.add(inputField);
+    mainPanel.add(outputField);
     mainPanel.add(inventoryDisplay);
     mainPanel.add(statDisplay);
     mainPanel.add(mapDisplay);
@@ -63,6 +69,9 @@ public class Main implements Runnable, ActionListener{
   public void actionPerformed(ActionEvent e){
     // get the command from the action
     String command = e.getActionCommand();
+
+    
+
 
   }
 
