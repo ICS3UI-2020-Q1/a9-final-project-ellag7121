@@ -96,7 +96,7 @@ public class Main implements Runnable, ActionListener{
         //roomItemBed();
         break;
       default:
-        outputField.setText("there is no " + input[1] + " at this location");
+        outputField.setText("there is no " + input[1] + " at this location.");
         break;
     }
   }
@@ -107,26 +107,26 @@ public class Main implements Runnable, ActionListener{
       case "open":
       //check if the drawer is closed
         if(!roomDrawerOpen){
-          outputField.setText("You open the drawer");
+          outputField.setText("You open the drawer.");
           roomDrawerOpen = true;
         }else{
-          outputField.setText("You cannot do this, the drawer is already open");
+          outputField.setText("You cannot do this, the drawer is already open.");
         }
         break;
       case "close":
       //check if the drawer is open
         if(roomDrawerOpen){
-          outputField.setText("You close the drawer");
+          outputField.setText("You close the drawer.");
           roomDrawerOpen = false;
         }else{
-          outputField.setText("You cannot do this, the drawer is already closed");
+          outputField.setText("You cannot do this, the drawer is already closed.");
         }
         break;
       case "examine":
         if(roomDrawerOpen){
-          outputField.setText("it is a chest of drawers in your room. \nit is currently open");
+          outputField.setText("it is a chest of drawers in your room. \nit is currently open.");
         }else{
-          outputField.setText("it is a chest of drawers in your room. \nit is currently closed");
+          outputField.setText("it is a chest of drawers in your room. \nit is currently closed.");
         }
         break;
       default:
