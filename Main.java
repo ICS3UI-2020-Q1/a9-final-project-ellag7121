@@ -82,6 +82,19 @@ public class Main implements Runnable, ActionListener{
     frame.add(mainPanel);
   }
 
+
+  //functional methods
+  public boolean inventoryContains(String item){
+    //check every item in the inventory array and see if the requested item is there
+    for(int i = 0; i < inventory.size(); i++){
+      if(inventory.get(i).equals(item)){
+        return true;
+      }
+    }
+    //if it has check all the contents of the inventory, and nothing matches your parameter, retruns false
+    return false;
+  } 
+
   //location methods:
   // --- ROOM --- //
   public void locationRoom(){
@@ -90,10 +103,17 @@ public class Main implements Runnable, ActionListener{
         roomItemDrawer();
         break;
       case "door":
-        //roomItemDoor();
+        roomItemDoor();
         break;
       case "bed":
-        //roomItemBed();
+        roomItemBed();
+        break;
+      case "coin":
+        if(!inventoryContains("coin") && roomDrawerOpen){
+          roomItemCoin();
+        }else{
+          outputField.setText("you cannot do this");
+        }
         break;
       default:
         outputField.setText("there is no " + input[1] + " at this location.");
@@ -124,7 +144,11 @@ public class Main implements Runnable, ActionListener{
         break;
       case "examine":
         if(roomDrawerOpen){
-          outputField.setText("it is a chest of drawers in your room. \nit is currently open.");
+          if(inventoryContains("coin")){
+            outputField.setText("it is a chest of drawers in your room. \nit is empty.");
+          }else{
+            outputField.setText("it is a chest of drawers in your room. \nit is currently open, and you see a shiny gold coin inside.");
+          }
         }else{
           outputField.setText("it is a chest of drawers in your room. \nit is currently closed.");
         }
@@ -135,6 +159,72 @@ public class Main implements Runnable, ActionListener{
     }
   }
 
+  //DOOR//
+  public void roomItemDoor(){
+    switch(input[0]){
+      case "open":
+      //check if the drawer is closed
+        if(!roomDoorOpen){
+          outputField.setText("You open the door.");
+          roomDoorOpen = true;
+        }else{
+          outputField.setText("You cannot do this, the door is already open.");
+        }
+        break;
+      case "close":
+      //check if the drawer is open
+        if(roomDoorOpen){
+          outputField.setText("You close the door.");
+          roomDoorOpen = false;
+        }else{
+          outputField.setText("You cannot do this, the door is already closed.");
+        }
+        break;
+      case "examine":
+        if(roomDoorOpen){
+          outputField.setText("it is the front door to your humble home. \nit is currently open, you see a path that leads to the town.");
+        }else{
+          outputField.setText("it is the front door to your humble home. \nit is currently closed.");
+        }
+        break;
+      default:
+        outputField.setText("You cannot " + input[0] + " the " + input[1]);
+        break;
+    }
+  }
+  //BED//
+  public void roomItemBed(){
+    switch(input[0]){
+      case "use":
+        outputField.setText("now is not the time to be sleeping!");
+        break;
+      case "examine":
+        outputField.setText("It is your wooden bed. \nit is not very comfortable.");
+        break;
+      default:
+        outputField.setText("You cannot " + input[0] + " the " + input[1]);
+        break;
+    }
+  }
+  //COIN//
+  public void roomItemCoin(){
+    switch(input[0]){
+      case "take":
+          outputField.setText("You take the gold coin from the open drawer");
+          inventory.add("coin");
+        break;
+      case "get":
+        outputField.setText("You take the gold coin from the open drawer");
+        inventory.add("coin");
+        break;
+      case "examine":
+        outputField.setText("It is a gold coin that can be used to buy things at shops. \nit is of small value.");
+        break;
+      default:
+        outputField.setText("You cannot " + input[0] + " the " + input[1]);
+        break;
+    }
+  }
 
   // --- TOWN --- //
   public void locationTown(){
@@ -149,8 +239,9 @@ public class Main implements Runnable, ActionListener{
     //store the nput in a Variable
     input = inputField.getText().split(" ");
 
-    //clear the input field
+    //clear the input and output fields
     inputField.setText("");
+    outputField.setText("");
 
     //go to the method based on the player's location
     switch(location){
@@ -161,6 +252,13 @@ public class Main implements Runnable, ActionListener{
         locationTown();
         break;
     }
+
+    //update the inventory display
+    inventoryDisplay.setText("inventory:");
+    for(int i = 0; i < inventory.size(); i++){
+      inventoryDisplay.setText(inventoryDisplay.getText() + "\n" + inventory.get(i));
+    }
+
   }
 
   // Main method to start our program
