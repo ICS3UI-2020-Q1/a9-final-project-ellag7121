@@ -18,8 +18,9 @@ public class Main implements Runnable, ActionListener{
 
   //initialize the main Variables
   String[] input; //the input split up into it's seperate words (0 is the action, 1 is the target)
-  String location = "room"; //the player's current location
+  String location = "menu"; //the player's current location
   ArrayList<String> inventory; //the array list to hold the inventory items
+
 
   //location specific Variables
   //room
@@ -52,7 +53,7 @@ public class Main implements Runnable, ActionListener{
     outputField = new JTextArea();
 
     statDisplay = new JTextArea();
-    inventoryDisplay = new JTextArea();
+    inventoryDisplay = new JTextArea("inventory:");
     mapDisplay = new JTextArea();
 
     //set up component locations
@@ -80,6 +81,9 @@ public class Main implements Runnable, ActionListener{
 
     //add main panel to the frame
     frame.add(mainPanel);
+
+    //initialize the array list 
+    inventory = new ArrayList<>();
   }
 
 
@@ -96,6 +100,14 @@ public class Main implements Runnable, ActionListener{
   } 
 
   //location methods:
+  // --- MENU --- //
+  public void locationMenu(){
+    switch(input[1]){
+      case "start":
+        location = "room";
+        break;
+    }
+  }
   // --- ROOM --- //
   public void locationRoom(){
     switch(input[1]){
@@ -109,11 +121,15 @@ public class Main implements Runnable, ActionListener{
         roomItemBed();
         break;
       case "coin":
+        System.out.println("hi");
         if(!inventoryContains("coin") && roomDrawerOpen){
           roomItemCoin();
         }else{
           outputField.setText("you cannot do this");
         }
+        break;
+      case "north":
+        roomItemNorth();
         break;
       default:
         outputField.setText("there is no " + input[1] + " at this location.");
@@ -225,6 +241,21 @@ public class Main implements Runnable, ActionListener{
         break;
     }
   }
+  //NORTH//
+  public void roomItemNorth(){
+    switch(input[0]){
+      case "go":
+          outputField.setText("You take the gold coin from the open drawer");
+          inventory.add("coin");
+        break;
+      case "examine":
+        outputField.setText("It is a gold coin that can be used to buy things at shops. \nit is of small value.");
+        break;
+      default:
+        outputField.setText("You cannot " + input[0] + " the " + input[1]);
+        break;
+    }
+  }
 
   // --- TOWN --- //
   public void locationTown(){
@@ -245,6 +276,9 @@ public class Main implements Runnable, ActionListener{
 
     //go to the method based on the player's location
     switch(location){
+      case "menu":
+        locationMenu();
+        break;
       case "room":
         locationRoom();
         break;
