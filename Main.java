@@ -34,6 +34,8 @@ public class Main implements Runnable, ActionListener{
   boolean hasWellCoin = false;
   boolean hasBarrelCoin = false;
   
+  //shop
+  int shopBalance = 0;
 
 
   // Method to assemble our GUI
@@ -420,11 +422,32 @@ public class Main implements Runnable, ActionListener{
         break;
     }
   }
+
+
   // --- SHOP --- //
  public void locationShop(){
    if(input.length > 1){
       switch(input[1]){
-        case "":
+        case "map":
+          if(!inventoryContains("map")){
+            shopItemMap();
+            break;
+          }else{
+            outputField.setText("you already have the map");
+          }
+        case "shovel":
+          if(!inventoryContains("shovel")){
+            shopItemShovel();
+            break;
+          }else{
+            outputField.setText("you already have the shovel");
+          }
+          break;
+        case "shopkeeper":
+          shopItemShopKeeper();
+          break;
+        case "west":
+          shopDirectionWest();
           break;
         default:
           outputField.setText("there is no " + input[1] + " at this location.");
@@ -434,6 +457,100 @@ public class Main implements Runnable, ActionListener{
       outputField.setText("unknown command, try typing \"help\" for a list of commands");
     }
  } 
+ //shop items
+ //MAP//
+ public void shopItemMap(){
+   switch(input[0]){
+      case "examine":
+        outputField.setText("it is a map of the whole island!\n that might be useful for getting through the forest!");
+        break;
+      case "get":
+        //if you have enough money 
+        if(shopBalance >= 1){
+          outputField.setText("since you were a good customer and actually paid for it, you can take the map."); 
+          inventory.add("map");
+          shopBalance--; 
+        }else{
+          outputField.setText("the shopkeeper yells at you for trying to steal the map, he then kicks you out of his shop.");
+          location = "town";
+        }
+        break;
+      case "take":
+        //if you have enough money 
+        if(shopBalance >= 1){
+          outputField.setText("since you were a good customer and actually paid for it, you can take the map."); 
+          inventory.add("map");
+          shopBalance--; 
+        }else{
+          outputField.setText("the shopkeeper yells at you for trying to steal the map, he then kicks you out of his shop.");
+          location = "town";
+        }
+        break;
+      default:
+        outputField.setText("You cannot " + input[0] + " the " + input[1]);
+        break;
+    }
+ }
+ //SHOVEL//
+ public void shopItemShovel(){
+   switch(input[0]){
+      case "examine":
+        outputField.setText("it is a shovel.\n\nhow much description does it need?");
+        break;
+      case "get":
+        //if you have enough money 
+        if(shopBalance >= 1){
+          outputField.setText("since you were a good customer and actually paid for it, you can take the shovel."); 
+          inventory.add("shovel");
+          shopBalance--; 
+        }else{
+          outputField.setText("the shopkeeper yells at you for trying to steal the shovel, he then kicks you out of his shop.");
+          location = "town";
+        }
+        break;
+      case "take":
+        //if you have enough money 
+        if(shopBalance >= 1){
+          outputField.setText("since you were a good customer and actually paid for it, you can take the shovel."); 
+          inventory.add("shovel");
+          shopBalance--; 
+        }else{
+          outputField.setText("the shopkeeper yells at you for trying to steal the shovel, he then kicks you out of his shop.");
+          location = "town";
+        }
+        break;
+      default:
+        outputField.setText("You cannot " + input[0] + " the " + input[1]);
+        break;
+    }
+ }
+ //SHOPKEEPER//
+  public void shopItemShopKeeper(){
+   switch(input[0]){
+      case "examine":
+        outputField.setText("The shopkeeper is a burly man. there is a sign beside him saying: \"pay first! take later!\"");
+        break;
+      case "talkto":
+        outputField.setText("the shopkeeper says: \"Oho! welcome traveller! to buy things from THIS shop, you give me gold coins and take anything you want!");
+        break;
+      case "give":
+        if(inventoryContains(input[2])){
+          if(input[2].equals("coin")){
+              outputField.setText("the shopkepper takes your gold coin and says: \"Ok! now ya can take one item from the shop.\"");
+              inventory.remove("coin");
+              shopBalance += 1;
+          }else{
+            outputField.setText("the shopkeeper tells you: \"I told you already, I want gold coins, not " + input[2] + "!\"");
+          }
+        }else{
+          outputField.setText("you can't give something you don't have!");
+        }
+        break;
+      default:
+        outputField.setText("You cannot " + input[0] + " the " + input[1]);
+        break;
+    }
+ }
 
 
   // method called when a button is pressed
