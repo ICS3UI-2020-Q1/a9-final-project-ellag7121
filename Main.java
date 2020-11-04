@@ -66,9 +66,9 @@ public class Main implements Runnable, ActionListener{
     //set up component locations
     inputField.setBounds(10,305,385,20);
     outputField.setBounds(10,10,780,285);
-    inventoryDisplay.setBounds(10,335,187,245);
-    descriptionDisplay.setBounds(208,335,187,245);
-    mapDisplay.setBounds(405,305,385,275);
+    inventoryDisplay.setBounds(10,335,187,225);
+    descriptionDisplay.setBounds(208,335,187,225);
+    mapDisplay.setBounds(405,305,385,255);
 
     //disable the text areas
     outputField.setEnabled(false);
