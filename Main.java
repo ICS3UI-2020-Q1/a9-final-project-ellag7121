@@ -11,10 +11,12 @@ public class Main implements Runnable, ActionListener{
   JTextField inputField;
   JTextArea outputField;
 
-  JTextArea statDisplay;
+  JTextArea descriptionDisplay;
   JTextArea inventoryDisplay;
   //placeholder until my image is made
   JTextArea mapDisplay;
+
+  Font basicFont;
 
   //initialize the main Variables
   String[] input; //the input split up into it's seperate words (0 is the action, 1 is the target)
@@ -26,9 +28,11 @@ public class Main implements Runnable, ActionListener{
   //room
   boolean roomDoorOpen = false;
   boolean roomDrawerOpen = false;
+  boolean hasDrawerCoin = false;
 
   //town
-
+  boolean hasWellCoin = false;
+  boolean hasBarrelCoin = false;
   
 
 
@@ -50,33 +54,43 @@ public class Main implements Runnable, ActionListener{
 
     //set up the components
     inputField = new JTextField();
-    outputField = new JTextArea();
+    //the menu description (sorry for the cheesy ASCII art)
+    outputField = new JTextArea("welcome to:\n\n #####  #######  #####  #    #     #####  #     # #######  #####  #######\n#     # #     # #     # #   #     #     # #     # #       #     #    #    \n#       #     # #       #  #      #     # #     # #       #          #    \n #####  #     # #       ###       #     # #     # #####    #####     #    \n      # #     # #       #  #      #   # # #     # #             #    #    \n#     # #     # #     # #   #     #    #  #     # #       #     #    #    \n #####  #######  #####  #    #     #### #  #####  #######  #####     #    \n\ntype \"start\" to begin...");
 
-    statDisplay = new JTextArea();
+    descriptionDisplay = new JTextArea();
     inventoryDisplay = new JTextArea("inventory:");
     mapDisplay = new JTextArea();
+
+    basicFont = new Font("MONOSPACED", Font.PLAIN, 12);
 
     //set up component locations
     inputField.setBounds(10,305,385,20);
     outputField.setBounds(10,10,780,285);
     inventoryDisplay.setBounds(10,335,187,245);
-    statDisplay.setBounds(208,335,187,245);
+    descriptionDisplay.setBounds(208,335,187,245);
     mapDisplay.setBounds(405,305,385,275);
 
     //disable the text areas
     outputField.setEnabled(false);
     inventoryDisplay.setEnabled(false);
-    statDisplay.setEnabled(false);
+    descriptionDisplay.setEnabled(false);
     mapDisplay.setEnabled(false);
 
     //create an action listener on the input field
     inputField.addActionListener(this);
 
+    //set the monospaced font 
+    inputField.setFont(basicFont);
+    outputField.setFont(basicFont);
+    inventoryDisplay.setFont(basicFont);
+    descriptionDisplay.setFont(basicFont);
+    mapDisplay.setFont(basicFont);
+
     //add components to the main panel
     mainPanel.add(inputField);
     mainPanel.add(outputField);
     mainPanel.add(inventoryDisplay);
-    mainPanel.add(statDisplay);
+    mainPanel.add(descriptionDisplay);
     mainPanel.add(mapDisplay);
 
     //add main panel to the frame
@@ -99,41 +113,50 @@ public class Main implements Runnable, ActionListener{
     return false;
   } 
 
+  public void descriptionAdd(String item){
+    //adds one item to the room description (this just looks cleaner than adding this every time)
+    descriptionDisplay.setText(descriptionDisplay.getText() + "\n" + "- " + item);
+  }
+
   //location methods:
   // --- MENU --- //
   public void locationMenu(){
-    switch(input[1]){
+    switch(input[0]){
       case "start":
+        outputField.setText("You wake up...\nand you're missing...\nyour left sock!\n\nafter panicking for a few minutes, you decide to investigate");
         location = "room";
         break;
     }
   }
   // --- ROOM --- //
   public void locationRoom(){
-    switch(input[1]){
-      case "drawer":
-        roomItemDrawer();
-        break;
-      case "door":
-        roomItemDoor();
-        break;
-      case "bed":
-        roomItemBed();
-        break;
-      case "coin":
-        System.out.println("hi");
-        if(!inventoryContains("coin") && roomDrawerOpen){
-          roomItemCoin();
-        }else{
-          outputField.setText("you cannot do this");
-        }
-        break;
-      case "north":
-        roomItemNorth();
-        break;
-      default:
-        outputField.setText("there is no " + input[1] + " at this location.");
-        break;
+    if(input.length > 1){
+      switch(input[1]){
+        case "drawer":
+          roomItemDrawer();
+          break;
+        case "door":
+          roomItemDoor();
+          break;
+        case "bed":
+          roomItemBed();
+          break;
+        case "coin":
+          if(!inventoryContains("coin") && roomDrawerOpen){
+            roomItemCoin();
+          }else{
+            outputField.setText("you cannot do this");
+          }
+          break;
+        case "north":
+          roomDirectionNorth();
+          break;
+        default:
+          outputField.setText("there is no " + input[1] + " at this location.");
+          break;
+      }
+    }else{
+      outputField.setText("unknown command, try typing \"help\" for a list of commands");
     }
   }
   //room items
@@ -160,7 +183,7 @@ public class Main implements Runnable, ActionListener{
         break;
       case "examine":
         if(roomDrawerOpen){
-          if(inventoryContains("coin")){
+          if(hasDrawerCoin){
             outputField.setText("it is a chest of drawers in your room. \nit is empty.");
           }else{
             outputField.setText("it is a chest of drawers in your room. \nit is currently open, and you see a shiny gold coin inside.");
@@ -174,7 +197,6 @@ public class Main implements Runnable, ActionListener{
         break;
     }
   }
-
   //DOOR//
   public void roomItemDoor(){
     switch(input[0]){
@@ -198,7 +220,7 @@ public class Main implements Runnable, ActionListener{
         break;
       case "examine":
         if(roomDoorOpen){
-          outputField.setText("it is the front door to your humble home. \nit is currently open, you see a path that leads to the town.");
+          outputField.setText("it is the front door to your humble home. \nit is currently open, you see a path that goes north.");
         }else{
           outputField.setText("it is the front door to your humble home. \nit is currently closed.");
         }
@@ -228,10 +250,12 @@ public class Main implements Runnable, ActionListener{
       case "take":
           outputField.setText("You take the gold coin from the open drawer");
           inventory.add("coin");
+          hasDrawerCoin = true;
         break;
       case "get":
         outputField.setText("You take the gold coin from the open drawer");
         inventory.add("coin");
+        hasDrawerCoin = true;
         break;
       case "examine":
         outputField.setText("It is a gold coin that can be used to buy things at shops. \nit is of small value.");
@@ -241,26 +265,124 @@ public class Main implements Runnable, ActionListener{
         break;
     }
   }
+  //room directions
   //NORTH//
-  public void roomItemNorth(){
+  public void roomDirectionNorth(){
     switch(input[0]){
       case "go":
-          outputField.setText("You take the gold coin from the open drawer");
-          inventory.add("coin");
-        break;
-      case "examine":
-        outputField.setText("It is a gold coin that can be used to buy things at shops. \nit is of small value.");
+        if(roomDoorOpen){
+          outputField.setText("You travel out the front door and follow the path until you reach the town.");
+          location = "town";
+        }else{
+          outputField.setText("You cannot go north, the front door is closed");
+        }
         break;
       default:
-        outputField.setText("You cannot " + input[0] + " the " + input[1]);
+        outputField.setText("You cannot " + input[0] + input[1]);
         break;
     }
   }
 
   // --- TOWN --- //
   public void locationTown(){
-
+    if(input.length > 1){
+      switch(input[1]){
+        case "well":
+          townItemWell();
+          break;
+        case "barrel":
+          townItemBarrel();
+          break;
+        case "merchant":
+          townItemMerchant();
+          break;
+        case "north":
+          //townDirectionNorth();
+          break;
+        case "east":
+          //townDirectionEast();
+          break;
+        case "south":
+          //townDirectionSouth();
+          break;
+        default:
+          outputField.setText("there is no " + input[1] + " at this location.");
+          break;
+      }
+    }else{
+      outputField.setText("unknown command, try typing \"help\" for a list of commands");
+    }
   }
+  //town items
+  //WELL//
+  public void townItemWell(){
+    switch(input[0]){
+      case "examine":
+        outputField.setText("there is a bucket lowered in the well with a crank to raise it. \nyou see your reflection in the water...\ngood lookin\' fella.");
+        break;
+      case "use":
+        if(!hasWellCoin){
+          outputField.setText("you raise the bucket out of the well water. inside you find a gold coin");
+          inventory.add("coin");
+          hasWellCoin = true;
+        }else{
+          outputField.setText("you raise the bucket out of the well water, but there is nothing inside.");
+        }
+        break;
+      default:
+        outputField.setText("You cannot " + input[0] + " the " + input[1]);
+        break;
+    }
+  }
+  //BARREL//
+  public void townItemBarrel(){
+    switch(input[0]){
+      case "examine":
+        if(!hasBarrelCoin){
+          outputField.setText("it's a barrel full of apples, inside you notice a gold coin.\nyou take it because it's free money!");
+          inventory.add("coin");
+          hasBarrelCoin = true;
+        }else{
+          outputField.setText("it's a barrel full of apples.");
+        }
+        break;
+      default:
+        outputField.setText("You cannot " + input[0] + " the " + input[1]);
+        break;
+    }
+  }
+  //GOAT MERCHANT//
+  public void townItemMerchant(){
+    switch(input[0]){
+      case "examine":
+        outputField.setText("the goat merchant is a tall heavy man, and he smells of goats\nI guess that's not much of a surprise.\n\nyou also notice that he is only wearing one sock. It seems you are not the only one missing a left sock today.");
+        break;
+      case "talkto":
+        outputField.setText("you greet the goat seller, he replies \"Hello there! could I interest you in a goat? only one gold coin each!\"");
+        break;
+      case "give":
+        if(inventoryContains(input[2])){
+          if(input[2].equals("coin")){
+            if(!inventoryContains("goat")){
+              outputField.setText("the goat merchant takes your gold coin and says: \"Thanks a bunch pal. I need these to buy another sock. \nmine was stolen last night\"\nhe then gives you the goat you purchased.");
+              inventory.remove("coin");
+              inventory.add("goat");
+            }else{
+              outputField.setText("Why would you do that? you only need one goat.");
+            }
+          }else{
+            outputField.setText("the merchant tells you: \"I told you already, I want gold coins, not " + input[2] + "!\"");
+          }
+        }else{
+          outputField.setText("you can't give something you don't have!");
+        }
+        break;
+      default:
+        outputField.setText("You cannot " + input[0] + " the " + input[1]);
+        break;
+    }
+  }
+
 
   // method called when a button is pressed
   public void actionPerformed(ActionEvent e){
@@ -272,25 +394,54 @@ public class Main implements Runnable, ActionListener{
 
     //clear the input and output fields
     inputField.setText("");
-    outputField.setText("");
 
-    //go to the method based on the player's location
-    switch(location){
-      case "menu":
-        locationMenu();
-        break;
-      case "room":
-        locationRoom();
-        break;
-      case "town":
-        locationTown();
-        break;
+    //check if the user wants a list of commands
+    if(input[0].equals("help")){
+      outputField.setText("COMMANDS:\n-examine: get a further description of an object\n-use: interact with a given object or inventory item\n-get/take: puts the given object in your inventory\n-go: sends you to the given location\n-open/close: opens or closes the given object\n-talkto: talks to the given person\n-give (target) (item): gives the specified person the specified object");
+    }else{
+      //go to the method based on the player's location
+      switch(location){
+        case "menu":
+          locationMenu();
+          break;
+        case "room":
+          locationRoom();
+          break;
+        case "town":
+          locationTown();
+          break;
+      }
     }
 
     //update the inventory display
     inventoryDisplay.setText("inventory:");
     for(int i = 0; i < inventory.size(); i++){
       inventoryDisplay.setText(inventoryDisplay.getText() + "\n" + inventory.get(i));
+    }
+
+    //update the room description
+    descriptionDisplay.setText(location + " description:");
+    switch(location){
+      case "menu":
+        descriptionAdd("type \"start\" to begin");
+        break;
+      case "room":
+        descriptionAdd("a bed");
+        descriptionAdd("a chest of drawers");
+        descriptionAdd("a front door");
+        descriptionAdd("a town to the north");
+        //if the coin is available
+        if(roomDrawerOpen && !hasDrawerCoin){
+          descriptionAdd("a coin");
+        }
+        break;
+      case "town":
+        descriptionAdd("an old well");
+        descriptionAdd("some barrels of fruit");
+        descriptionAdd("a goat merchant");
+        descriptionAdd("a store to the east");
+        descriptionAdd("woods to the north");
+        descriptionAdd("your home to the south");
     }
 
   }
