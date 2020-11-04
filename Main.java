@@ -57,7 +57,7 @@ public class Main implements Runnable, ActionListener{
     //the menu description (sorry for the cheesy ASCII art)
     outputField = new JTextArea("welcome to:\n\n #####  #######  #####  #    #     #####  #     # #######  #####  #######\n#     # #     # #     # #   #     #     # #     # #       #     #    #    \n#       #     # #       #  #      #     # #     # #       #          #    \n #####  #     # #       ###       #     # #     # #####    #####     #    \n      # #     # #       #  #      #   # # #     # #             #    #    \n#     # #     # #     # #   #     #    #  #     # #       #     #    #    \n #####  #######  #####  #    #     #### #  #####  #######  #####     #    \n\ntype \"start\" to begin...");
 
-    descriptionDisplay = new JTextArea();
+    descriptionDisplay = new JTextArea("menu description:\n- type \"start\" to begin");
     inventoryDisplay = new JTextArea("inventory:");
     mapDisplay = new JTextArea();
 
@@ -297,13 +297,13 @@ public class Main implements Runnable, ActionListener{
           townItemMerchant();
           break;
         case "north":
-          //townDirectionNorth();
+          townDirectionNorth();
           break;
         case "east":
-          //townDirectionEast();
+          townDirectionEast();
           break;
         case "south":
-          //townDirectionSouth();
+          townDirectionSouth();
           break;
         default:
           outputField.setText("there is no " + input[1] + " at this location.");
@@ -382,6 +382,58 @@ public class Main implements Runnable, ActionListener{
         break;
     }
   }
+  //town directions
+  //NORTH//
+  public void townDirectionNorth(){
+    switch(input[0]){
+      case "go":
+      //cannot enter forest without the map
+          outputField.setText("");
+          location = "forest1";
+        break;
+      default:
+        outputField.setText("You cannot " + input[0] + input[1]);
+        break;
+    }
+  }
+  //EAST//
+  public void townDirectionEast(){
+    switch(input[0]){
+      case "go":
+          outputField.setText("you follow a winding road outside the town. it takes you to a local K-mart");
+          location = "shop";
+        break;
+      default:
+        outputField.setText("You cannot " + input[0] + input[1]);
+        break;
+    }
+  }
+  //SOUTH//
+  public void townDirectionSouth(){
+    switch(input[0]){
+      case "go":
+          outputField.setText("You travel down the path to the south until you end up back at your home");
+          location = "room";
+        break;
+      default:
+        outputField.setText("You cannot " + input[0] + input[1]);
+        break;
+    }
+  }
+  // --- SHOP --- //
+ public void locationShop(){
+   if(input.length > 1){
+      switch(input[1]){
+        case "":
+          break;
+        default:
+          outputField.setText("there is no " + input[1] + " at this location.");
+          break;
+      }
+    }else{
+      outputField.setText("unknown command, try typing \"help\" for a list of commands");
+    }
+ } 
 
 
   // method called when a button is pressed
@@ -397,7 +449,7 @@ public class Main implements Runnable, ActionListener{
 
     //check if the user wants a list of commands
     if(input[0].equals("help")){
-      outputField.setText("COMMANDS:\n-examine: get a further description of an object\n-use: interact with a given object or inventory item\n-get/take: puts the given object in your inventory\n-go: sends you to the given location\n-open/close: opens or closes the given object\n-talkto: talks to the given person\n-give (target) (item): gives the specified person the specified object");
+      outputField.setText("COMMANDS:\n-examine: get a further description of an object\n-use: interact with a given object or inventory item\n-get/take: puts the given object in your inventory\n-go: sends you to the given location\n-open/close: opens or closes the given object\n-talkto: talks to the given person\n-give (target) (item): gives the specified person the specified object\n-eat: eats the specified target");
     }else{
       //go to the method based on the player's location
       switch(location){
@@ -409,6 +461,9 @@ public class Main implements Runnable, ActionListener{
           break;
         case "town":
           locationTown();
+          break;
+        case "shop":
+          locationShop();
           break;
       }
     }
