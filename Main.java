@@ -19,6 +19,7 @@ public class Main implements Runnable, ActionListener{
   Font basicFont;
 
   //initialize the main Variables
+  String pureInput; //the input but it's not sperated
   String[] input; //the input split up into it's seperate words (0 is the action, 1 is the target)
   String location = "menu"; //the player's current location
   ArrayList<String> inventory; //the array list to hold the inventory items
@@ -45,6 +46,7 @@ public class Main implements Runnable, ActionListener{
 
   //beach
   boolean boxRevealed = false;
+  int oldManConvo = 0;
 
 
   // Method to assemble our GUI
@@ -153,7 +155,7 @@ public class Main implements Runnable, ActionListener{
           roomItemBed();
           break;
         case "coin":
-          if(!inventoryContains("coin") && roomDrawerOpen){
+          if(!hasDrawerCoin && roomDrawerOpen){
             roomItemCoin();
           }else{
             outputField.setText("you cannot do this");
@@ -726,36 +728,52 @@ public class Main implements Runnable, ActionListener{
 
   // --- BEACH --- //
   public void locationBeach(){
-    if(input.length > 1){
-      switch(input[1]){
-        case "oldman":
-          beachItemOldman();
+    if(oldManConvo > 0){ //if the player is in the old man conversation
+      switch(oldManConvo){
+        case 1:
+          outputField.setText("You tell the old man that your name is " + pureInput + ".\n\nthe old man says: \"What... is your Quest?\"");
+          oldManConvo++; //go to the next question
           break;
-        case "box":
-          if(boxRevealed){
-            beachItemBox();
-          }else{
-            outputField.setText("there is no " + input[1] + " at this location.");
-          }
+        case 2:
+          outputField.setText("You tell the old man that your quest is " + pureInput + ".\n\nthe old man says:  \"What... is your Favourite color?\"");
+          oldManConvo++; //go to the next question
           break;
-        case "shovel":
-          beachUseShovel();
-          break;
-        case "north":
-          beachDirectionNorth();
-          break;
-        case "east":
-          beachDirectionEast();
-          break;
-        case "west":
-          beachDirectionWest();
-          break;
-        default:
-          outputField.setText("there is no " + input[1] + " at this location.");
+        case 3:
+          outputField.setText("You tell the old man that your favourite color is " + pureInput + ".\n\nthe old man says:  \"Good Job...\"\n...\nYou realize that talking to this man was completely useless.");
+          oldManConvo = 0; //reset the conversation
           break;
       }
-    }else{
-      outputField.setText("unknown command, try typing \"help\" for a list of commands");
+    }else{ //check for actions
+      if(input.length > 1){
+        switch(input[1]){
+          case "oldman":
+            beachItemOldman();
+            break;
+          case "box":
+            if(boxRevealed){
+              beachItemBox();
+            }else{
+              outputField.setText("there is no " + input[1] + " at this location.");
+            }
+            break;
+          case "shovel":
+            beachUseShovel();
+            break;
+          case "north":
+            beachDirectionNorth();
+            break;
+          case "east":
+            beachDirectionEast();
+            break;
+          case "west":
+            beachDirectionWest();
+            break;
+          default:
+            outputField.setText("there is no " + input[1] + " at this location.");
+            break;
+        }
+      }else{
+      }outputField.setText("unknown command, try typing \"help\" for a list of commands");
     }
   }
   //beach items
@@ -766,7 +784,8 @@ public class Main implements Runnable, ActionListener{
         outputField.setText("it is an old man sitting in a small tent on the beach, he is murmuring things to himself.");
         break;
       case "talkto":
-        
+        outputField.setText("\"Stop! Who would cross this Beach must answer me these questions three, ere the other side he see.\"\nyou ask the old man what the first question is,\nthe man mumbles: \"What... is your name?\"");
+        oldManConvo++; //add 1 to question counter (starts the first question)
         break;
       default:
         outputField.setText("You cannot " + input[0] + " the " + input[1]);
@@ -853,7 +872,8 @@ public class Main implements Runnable, ActionListener{
     // get the command from the action
     String command = e.getActionCommand();
 
-    //store the nput in a Variable
+    //store the input in a Variables
+    pureInput = inputField.getText();
     input = inputField.getText().split(" ");
 
     //clear the input and output fields
@@ -863,27 +883,27 @@ public class Main implements Runnable, ActionListener{
     if(input[0].equals("help")){
       outputField.setText("COMMANDS:\n-examine: get a further description of an object\n-use: interact with a given object or inventory item\n-get/take: puts the given object in your inventory\n-go: sends you to the given location\n-open/close: opens or closes the given object\n-talkto: talks to the given person\n-give (target) (item): gives the specified person the specified object\n-eat: eats the specified target");
     }else{
-      //go to the method based on the player's location
-      switch(location){
-        case "menu":
-          locationMenu();
-          break;
-        case "room":
-          locationRoom();
-          break;
-        case "town":
-          locationTown();
-          break;
-        case "shop":
-          locationShop();
-          break;
-        case "forest":
-          locationForest();
-          break;
-        case "beach":
-          locationBeach();
-          break;
-      }
+        //go to the method based on the player's location
+        switch(location){
+          case "menu":
+            locationMenu();
+            break;
+          case "room":
+            locationRoom();
+            break;
+          case "town":
+            locationTown();
+            break;
+          case "shop":
+            locationShop();
+            break;
+          case "forest":
+            locationForest();
+            break;
+          case "beach":
+            locationBeach();
+            break;
+        }
     }
 
     //update the inventory display
@@ -891,7 +911,6 @@ public class Main implements Runnable, ActionListener{
     for(int i = 0; i < inventory.size(); i++){
       inventoryDisplay.setText(inventoryDisplay.getText() + "\n" + inventory.get(i));
     }
-
     //update the room description
     descriptionDisplay.setText(location + " description:");
     switch(location){
@@ -941,6 +960,7 @@ public class Main implements Runnable, ActionListener{
         descriptionAdd("a pirate ship to the north");
         descriptionAdd("a cave to the east");
         descriptionAdd("a forest to the west");
+        break;
     }
   }
 
