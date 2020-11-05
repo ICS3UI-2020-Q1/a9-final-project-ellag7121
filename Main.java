@@ -35,7 +35,8 @@ public class Main implements Runnable, ActionListener{
   boolean hasBarrelCoin = false;
   
   //shop
-  int shopBalance = 0;
+  int shopBalance = 0;//the current in store credit you have given the shopkeeper
+  int coinsGiven = 0; //the total amount of coins you've given to the shopkeeper, will not go over 2. (this is to prevent softlocking)
 
 
   // Method to assemble our GUI
@@ -280,7 +281,7 @@ public class Main implements Runnable, ActionListener{
         }
         break;
       default:
-        outputField.setText("You cannot " + input[0] + input[1]);
+        outputField.setText("You cannot " + input[0] + " " + input[1]);
         break;
     }
   }
@@ -324,7 +325,7 @@ public class Main implements Runnable, ActionListener{
         break;
       case "use":
         if(!hasWellCoin){
-          outputField.setText("you raise the bucket out of the well water. inside you find a gold coin");
+          outputField.setText("you raise the bucket out of the well water. inside you find a gold coin.\nYou take it because it's free money!");
           inventory.add("coin");
           hasWellCoin = true;
         }else{
@@ -390,11 +391,15 @@ public class Main implements Runnable, ActionListener{
     switch(input[0]){
       case "go":
       //cannot enter forest without the map
-          outputField.setText("");
-          location = "forest1";
+        if(inventoryContains("map")){
+            outputField.setText("now that you have your handy map you can safely enter the forest!");
+            location = "forest";
+        }else{
+          outputField.setText("If you go into the forest without a map you'll surely get lost! \nInstead, you head back to the town.");
+        }
         break;
       default:
-        outputField.setText("You cannot " + input[0] + input[1]);
+        outputField.setText("You cannot " + input[0] + " " + input[1]);
         break;
     }
   }
@@ -402,11 +407,11 @@ public class Main implements Runnable, ActionListener{
   public void townDirectionEast(){
     switch(input[0]){
       case "go":
-          outputField.setText("you follow a winding road outside the town. it takes you to a local K-mart");
+          outputField.setText("you follow a winding road outside the town. it takes you to a local shop outside town.");
           location = "shop";
         break;
       default:
-        outputField.setText("You cannot " + input[0] + input[1]);
+        outputField.setText("You cannot " + input[0] + " " + input[1]);
         break;
     }
   }
@@ -418,7 +423,7 @@ public class Main implements Runnable, ActionListener{
           location = "room";
         break;
       default:
-        outputField.setText("You cannot " + input[0] + input[1]);
+        outputField.setText("You cannot " + input[0] + " " + input[1]);
         break;
     }
   }
@@ -435,6 +440,7 @@ public class Main implements Runnable, ActionListener{
           }else{
             outputField.setText("you already have the map");
           }
+          break;
         case "shovel":
           if(!inventoryContains("shovel")){
             shopItemShovel();
@@ -456,77 +462,77 @@ public class Main implements Runnable, ActionListener{
     }else{
       outputField.setText("unknown command, try typing \"help\" for a list of commands");
     }
- } 
- //shop items
- //MAP//
- public void shopItemMap(){
-   switch(input[0]){
-      case "examine":
-        outputField.setText("it is a map of the whole island!\n that might be useful for getting through the forest!");
-        break;
-      case "get":
-        //if you have enough money 
-        if(shopBalance >= 1){
-          outputField.setText("since you were a good customer and actually paid for it, you can take the map."); 
-          inventory.add("map");
-          shopBalance--; 
-        }else{
-          outputField.setText("the shopkeeper yells at you for trying to steal the map, he then kicks you out of his shop.");
-          location = "town";
-        }
-        break;
-      case "take":
-        //if you have enough money 
-        if(shopBalance >= 1){
-          outputField.setText("since you were a good customer and actually paid for it, you can take the map."); 
-          inventory.add("map");
-          shopBalance--; 
-        }else{
-          outputField.setText("the shopkeeper yells at you for trying to steal the map, he then kicks you out of his shop.");
-          location = "town";
-        }
-        break;
-      default:
-        outputField.setText("You cannot " + input[0] + " the " + input[1]);
-        break;
-    }
- }
- //SHOVEL//
- public void shopItemShovel(){
-   switch(input[0]){
-      case "examine":
-        outputField.setText("it is a shovel.\n\nhow much description does it need?");
-        break;
-      case "get":
-        //if you have enough money 
-        if(shopBalance >= 1){
-          outputField.setText("since you were a good customer and actually paid for it, you can take the shovel."); 
-          inventory.add("shovel");
-          shopBalance--; 
-        }else{
-          outputField.setText("the shopkeeper yells at you for trying to steal the shovel, he then kicks you out of his shop.");
-          location = "town";
-        }
-        break;
-      case "take":
-        //if you have enough money 
-        if(shopBalance >= 1){
-          outputField.setText("since you were a good customer and actually paid for it, you can take the shovel."); 
-          inventory.add("shovel");
-          shopBalance--; 
-        }else{
-          outputField.setText("the shopkeeper yells at you for trying to steal the shovel, he then kicks you out of his shop.");
-          location = "town";
-        }
-        break;
-      default:
-        outputField.setText("You cannot " + input[0] + " the " + input[1]);
-        break;
-    }
- }
- //SHOPKEEPER//
+  } 
+  //shop items
+  //MAP//
+  public void shopItemMap(){
+    switch(input[0]){
+        case "examine":
+          outputField.setText("it is a map of the whole island!\n that might be useful for getting through the forest!");
+          break;
+        case "get":
+          //if you have enough money 
+          if(shopBalance >= 1){
+            outputField.setText("since you were a good customer and actually paid for it, you can take the map."); 
+            inventory.add("map");
+            shopBalance--; 
+          }else{
+            outputField.setText("the shopkeeper yells at you for trying to steal the map, he then kicks you out of his shop.");
+            location = "town";
+          }
+          break;
+        case "take":
+          //if you have enough money 
+          if(shopBalance >= 1){
+            outputField.setText("since you were a good customer and actually paid for it, you can take the map."); 
+            inventory.add("map");
+            shopBalance--; 
+          }else{
+            outputField.setText("the shopkeeper yells at you for trying to steal the map, he then kicks you out of his shop.");
+            location = "town";
+          }
+          break;
+        default:
+          outputField.setText("You cannot " + input[0] + " the " + input[1]);
+          break;
+      }
+  }
+  //SHOVEL//
+  public void shopItemShovel(){
+    switch(input[0]){
+        case "examine":
+          outputField.setText("it is a shovel.\n\nhow much description does it need?");
+          break;
+        case "get":
+          //if you have enough money 
+          if(shopBalance >= 1){
+            outputField.setText("since you were a good customer and actually paid for it, you can take the shovel."); 
+            inventory.add("shovel");
+            shopBalance--; 
+          }else{
+            outputField.setText("the shopkeeper yells at you for trying to steal the shovel, he then kicks you out of his shop.");
+            location = "town";
+          }
+          break;
+        case "take":
+          //if you have enough money 
+          if(shopBalance >= 1){
+            outputField.setText("since you were a good customer and actually paid for it, you can take the shovel."); 
+            inventory.add("shovel");
+            shopBalance--; 
+          }else{
+            outputField.setText("the shopkeeper yells at you for trying to steal the shovel, he then kicks you out of his shop.");
+            location = "town";
+          }
+          break;
+        default:
+          outputField.setText("You cannot " + input[0] + " the " + input[1]);
+          break;
+      }
+  }
+  //SHOPKEEPER//
   public void shopItemShopKeeper(){
-   switch(input[0]){
+  switch(input[0]){
       case "examine":
         outputField.setText("The shopkeeper is a burly man. there is a sign beside him saying: \"pay first! take later!\"");
         break;
@@ -536,11 +542,16 @@ public class Main implements Runnable, ActionListener{
       case "give":
         if(inventoryContains(input[2])){
           if(input[2].equals("coin")){
+            if(coinsGiven < 2){
               outputField.setText("the shopkepper takes your gold coin and says: \"Ok! now ya can take one item from the shop.\"");
               inventory.remove("coin");
               shopBalance += 1;
+              coinsGiven += 1;
+            }else{
+              outputField.setText("you've given the shopkeeper enough money by now. You don't want to spend it all in one place, do you?");
+            }
           }else{
-            outputField.setText("the shopkeeper tells you: \"I told you already, I want gold coins, not " + input[2] + "!\"");
+            outputField.setText("the shopkeeper tells you: \"I told you already, I want gold coins, not a " + input[2] + "!\"");
           }
         }else{
           outputField.setText("you can't give something you don't have!");
@@ -550,7 +561,26 @@ public class Main implements Runnable, ActionListener{
         outputField.setText("You cannot " + input[0] + " the " + input[1]);
         break;
     }
- }
+  }
+  //shop directions
+  //WEST//
+  public void shopDirectionWest(){
+    switch(input[0]){
+        case "go":
+            outputField.setText("You travel back down the winding road until you have returned to the town.");
+            location = "town";
+          break;
+        default:
+          outputField.setText("You cannot " + input[0] + " " + input[1]);
+          break;
+      }
+  }
+
+
+  // --- FOREST --- //
+  public void locationForest(){
+    
+  }
 
 
   // method called when a button is pressed
@@ -581,6 +611,9 @@ public class Main implements Runnable, ActionListener{
           break;
         case "shop":
           locationShop();
+          break;
+        case "forest":
+          locationForest();
           break;
       }
     }
@@ -614,8 +647,14 @@ public class Main implements Runnable, ActionListener{
         descriptionAdd("a store to the east");
         descriptionAdd("woods to the north");
         descriptionAdd("your home to the south");
+        break;
+      case "shop":
+        descriptionAdd("a shopkeeper");
+        descriptionAdd("a map");
+        descriptionAdd("a shovel");
+        descriptionAdd("a western path leading \nto the town");
+        break;
     }
-
   }
 
   // Main method to start our program
