@@ -627,7 +627,7 @@ public class Main implements Runnable, ActionListener{
   public void forestItemShrub(){
     switch(input[0]){
         case "examine":
-          outputField.setText("it is just a shrub.\n\nyou reach in to see if there is anything inside... and you hear someone say: \"ow\".");
+          outputField.setText("it is a shrub (it is one that looks nice, and it's not too expensive).\n\nyou reach in to see if there is anything inside... and you hear someone say: \"ow\".");
           break;
         default:
           outputField.setText("You cannot " + input[0] + " the " + input[1]);
@@ -655,7 +655,7 @@ public class Main implements Runnable, ActionListener{
   public void forestItemShrubGuy(){
     switch(input[0]){
         case "examine":
-          outputField.setText("it is not a shrub at all, just some creep who dresses up like a shrub (it is a nice one, not too expensive)\nto stop any passing travellers.\nonly if there was something i could use to get him to leave.");
+          outputField.setText("it is not a shrub at all, just some creep who dresses up like a shrub to stop any passing travellers.\nonly if there was something i could use to get him to leave.");
           break;
         case "talkto":
           outputField.setText("you ask the SHRUBGUY to let you pass. \nshrubguy yells to you \"OH, SO YOU WANT TO LEAVE??? OK THEN!\" the SHRUBGUY briefly moved out of your way\nbut before you can pass, he returns to his original position and yells to you:\n\"HA HA, YOU THINK I WOULD ACTUALLY LET YOU PASS THAT EASILY!?!?!?\"");
