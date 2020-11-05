@@ -547,7 +547,7 @@ public class Main implements Runnable, ActionListener{
         outputField.setText("The shopkeeper is a burly man. there is a sign beside him saying: \"pay first! take later!\"");
         break;
       case "talkto":
-        outputField.setText("the shopkeeper says: \"Oho! welcome traveller! to buy things from THIS shop, you give me gold coins and take anything you want!");
+        outputField.setText("the shopkeeper says: \"Oho! welcome traveller! to buy things from THIS shop, you give me gold coins and take \nanything you want!");
         break;
       case "give":
         if(inventoryContains(input[2])){
@@ -675,7 +675,7 @@ public class Main implements Runnable, ActionListener{
       case "use":
         if(inventoryContains("goat")){
             if(shrubguyEntered && !shrubguyExited){
-              outputField.setText("the SHRUBGUY yells to you \"HA HA, YOU FOOL! YOU FELL VICTIM TO ONE OF THE CLASSIC BLUNDERS! \nNEVER GO IN AGAINST A SHRUBGUY WHEN DEATH IS ON THE LINE!!!!\" \nat this point, you are tired of the SHRUBGUY's yelling (although you appreciate the movie quote) and you release your goat, \nit begins to chew on SHRUBGUY's leaves which causes the SHRUBGUY to run away.\n\nthe path is now clear, you can continue through the forest.");
+              outputField.setText("the SHRUBGUY yells to you \"HA HA, YOU FOOL! YOU FELL VICTIM TO ONE OF THE CLASSIC BLUNDERS! \nNEVER GO IN AGAINST A SHRUBGUY WHEN DEATH IS ON THE LINE!!!!\" \nat this point, you are tired of the SHRUBGUY's yelling (although you appreciate the movie quote) and you \nrelease your goat, it begins to chew on SHRUBGUY's leaves which causes the SHRUBGUY to run away.\n\nthe path is now clear, you can continue through the forest.");
               shrubguyExited = true;
             }else if(!shrubguyEntered){
               outputField.setText("why do you need to release the goat here?");
