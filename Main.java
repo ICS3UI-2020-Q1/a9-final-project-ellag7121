@@ -721,6 +721,81 @@ public class Main implements Runnable, ActionListener{
       }
   }
 
+  // --- BEACH --- //
+  public void locationBeach(){
+    if(input.length > 1){
+      switch(input[1]){
+        case "oldman":
+          beachItemOldman();
+          break;
+        case "shovel":
+          beachUseShovel();
+          break;
+        case "north":
+          beachDirectionNorth();
+          break;
+        case "east":
+          beachDirectionEast();
+          break;
+        case "west":
+          beachDirectionWest
+          break;
+        default:
+          outputField.setText("there is no " + input[1] + " at this location.");
+          break;
+      }
+    }else{
+      outputField.setText("unknown command, try typing \"help\" for a list of commands");
+    }
+  }
+  //beach items
+  //OLD MAN//
+  public void beachItemOldman(){
+
+  }
+  //beach inventory items
+  //SHOVEL//
+  public void beachUseShovel(){
+
+  }
+  //beach directions
+  //NORTH//
+  public void beachDirectionNorth(){
+    switch(input[0]){
+        case "go":
+            outputField.setText("");
+            location = "";
+          break;
+        default:
+          outputField.setText("You cannot " + input[0] + " " + input[1]);
+          break;
+      }
+  }
+  //EAST//
+  public void beachDirectionEast(){
+    switch(input[0]){
+        case "go":
+            outputField.setText("");
+            location = "";
+          break;
+        default:
+          outputField.setText("You cannot " + input[0] + " " + input[1]);
+          break;
+      }
+  }
+  //WEST//
+  public void beachDirectionWest(){
+    switch(input[0]){
+        case "go":
+            outputField.setText("");
+            location = "";
+          break;
+        default:
+          outputField.setText("You cannot " + input[0] + " " + input[1]);
+          break;
+      }
+  }
+
   // method called when a button is pressed
   public void actionPerformed(ActionEvent e){
     // get the command from the action
@@ -752,6 +827,9 @@ public class Main implements Runnable, ActionListener{
           break;
         case "forest":
           locationForest();
+          break;
+        case "beach":
+          locationBeach();
           break;
       }
     }
@@ -806,6 +884,11 @@ public class Main implements Runnable, ActionListener{
         descriptionAdd("a north path that leads \nout of the forest");
         descriptionAdd("a south path that leads to \nthe town");
         break;
+      case "beach":
+        descriptionAdd("an old man");
+        descriptionAdd("a pirate ship to the north");
+        descriptionAdd("a cave to the east");
+        descriptionAdd("a forest to the west");
     }
   }
 
