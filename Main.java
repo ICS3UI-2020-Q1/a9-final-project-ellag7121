@@ -43,6 +43,9 @@ public class Main implements Runnable, ActionListener{
   boolean shrubguyExited = false;
   boolean hasRockCoin = false;
 
+  //beach
+  boolean boxRevealed = false;
+
 
   // Method to assemble our GUI
   public void run(){
@@ -728,6 +731,13 @@ public class Main implements Runnable, ActionListener{
         case "oldman":
           beachItemOldman();
           break;
+        case "box":
+          if(boxRevealed){
+            beachItemBox();
+          }else{
+            outputField.setText("there is no " + input[1] + " at this location.");
+          }
+          break;
         case "shovel":
           beachUseShovel();
           break;
@@ -738,7 +748,7 @@ public class Main implements Runnable, ActionListener{
           beachDirectionEast();
           break;
         case "west":
-          beachDirectionWest
+          beachDirectionWest();
           break;
         default:
           outputField.setText("there is no " + input[1] + " at this location.");
@@ -751,12 +761,54 @@ public class Main implements Runnable, ActionListener{
   //beach items
   //OLD MAN//
   public void beachItemOldman(){
-
+    switch(input[0]){
+      case "examine":
+        outputField.setText("it is an old man sitting in a small tent on the beach, he is murmuring things to himself.");
+        break;
+      case "talkto":
+        
+        break;
+      default:
+        outputField.setText("You cannot " + input[0] + " the " + input[1]);
+        break;
+    }
+  }
+  //BOX//
+  public void beachItemBox(){
+    switch(input[0]){
+      case "examine":
+        if(!inventoryContains("key")){
+          outputField.setText("it is a small cardboard box that you dug up on the beach. inside there is a small key. \nyou decide to take it");
+          inventory.add("key");
+        }else{
+          outputField.setText("it is a small cardboard box that you dug up on the beach.\nit is empty.");
+        }
+        break;
+      default:
+        outputField.setText("You cannot " + input[0] + " the " + input[1]);
+        break;
+    }
   }
   //beach inventory items
   //SHOVEL//
   public void beachUseShovel(){
-
+    switch(input[0]){
+      case "use":
+        if(inventoryContains("shovel")){
+          if(!boxRevealed){
+            outputField.setText("You start digging around the beach until you find a box buried underground.");
+            boxRevealed = true;
+          }else{
+            outputField.setText("You've already dug holes through the entire beach, you probably shouldn't dig anymore.");
+          }
+        }else{
+          outputField.setText("what shovel do you mean?");
+        }
+        break;
+      default:
+        outputField.setText("You cannot " + input[0] + " the " + input[1]);
+        break;
+    }
   }
   //beach directions
   //NORTH//
@@ -764,7 +816,7 @@ public class Main implements Runnable, ActionListener{
     switch(input[0]){
         case "go":
             outputField.setText("");
-            location = "";
+            location = "pirateShip";
           break;
         default:
           outputField.setText("You cannot " + input[0] + " " + input[1]);
@@ -776,7 +828,7 @@ public class Main implements Runnable, ActionListener{
     switch(input[0]){
         case "go":
             outputField.setText("");
-            location = "";
+            location = "cave";
           break;
         default:
           outputField.setText("You cannot " + input[0] + " " + input[1]);
@@ -787,8 +839,8 @@ public class Main implements Runnable, ActionListener{
   public void beachDirectionWest(){
     switch(input[0]){
         case "go":
-            outputField.setText("");
-            location = "";
+            outputField.setText("You travel to the east until you reach the forest.");
+            location = "forest";
           break;
         default:
           outputField.setText("You cannot " + input[0] + " " + input[1]);
