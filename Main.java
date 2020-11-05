@@ -586,7 +586,6 @@ public class Main implements Runnable, ActionListener{
       }
   }
 
-
   // --- FOREST --- //
   public void locationForest(){
     if(input.length > 1){
@@ -773,7 +772,8 @@ public class Main implements Runnable, ActionListener{
             break;
         }
       }else{
-      }outputField.setText("unknown command, try typing \"help\" for a list of commands");
+        outputField.setText("unknown command, try typing \"help\" for a list of commands");
+      }
     }
   }
   //beach items
@@ -801,6 +801,14 @@ public class Main implements Runnable, ActionListener{
           inventory.add("key");
         }else{
           outputField.setText("it is a small cardboard box that you dug up on the beach.\nit is empty.");
+        }
+        break;
+      case "open":
+        if(!inventoryContains("key")){
+          outputField.setText("inside the box there is a small key. \nyou decide to take it");
+          inventory.add("key");
+        }else{
+          outputField.setText("the box is empty.");
         }
         break;
       default:
@@ -957,6 +965,9 @@ public class Main implements Runnable, ActionListener{
         break;
       case "beach":
         descriptionAdd("an old man");
+        if(boxRevealed){
+          descriptionAdd("a box");
+        }
         descriptionAdd("a pirate ship to the north");
         descriptionAdd("a cave to the east");
         descriptionAdd("a forest to the west");
