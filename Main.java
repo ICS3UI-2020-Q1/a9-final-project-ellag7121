@@ -866,7 +866,7 @@ public class Main implements Runnable, ActionListener{
   public void beachDirectionWest(){
     switch(input[0]){
         case "go":
-            outputField.setText("You travel to the east until you reach the forest.");
+            outputField.setText("You travel to the west until you reach the forest.");
             location = "forest";
           break;
         default:
