@@ -38,6 +38,11 @@ public class Main implements Runnable, ActionListener{
   int shopBalance = 0;//the current in store credit you have given the shopkeeper
   int coinsGiven = 0; //the total amount of coins you've given to the shopkeeper, will not go over 2. (this is to prevent softlocking)
 
+  //forest
+  boolean shrubguyEntered = false;
+  boolean shrubguyExited = false;
+  boolean hasRockCoin = false;
+
 
   // Method to assemble our GUI
   public void run(){
@@ -579,9 +584,103 @@ public class Main implements Runnable, ActionListener{
 
   // --- FOREST --- //
   public void locationForest(){
-    
+    if(input.length > 1){
+        switch(input[1]){
+          case "shrub":
+            if(!shrubguyEntered && !shrubguyExited){  
+              forestItemShrub();
+            }else{
+              outputField("it turns out the shrub was actually a guy in disguise... remember?");
+            }
+            break;
+          case "rock":
+            forestItemRock();
+            break;
+          case "shrubguy":
+            if(shrubguyEntered && !shrubguyExited){
+              forestItemShrubGuy();
+            }else if(!shrubguyEntered){
+              outputField.setText("there is no " + input[1] + " at this location.");
+            }else{
+              outputField.setText("shrub guy ran away... remember?");
+            }
+            break;
+          case "north":
+            forestDirectionNorth();
+            break;
+          case "south":
+            forestDirectionSouth();
+            break;
+          default:
+            outputField.setText("there is no " + input[1] + " at this location.");
+            break;
+        }
+    }else{
+        outputField.setText("unknown command, try typing \"help\" for a list of commands");
+    }
+  } 
+  //forest items
+  //SHRUB//
+  public void forestItemShrub(){
+    switch(input[0]){
+        case "examine":
+          outputField.setText("it is just a shrub.\n\nyou reach in to see if there is anything inside... and you hear someone say: \"ow\".");
+          break;
+        default:
+          outputField.setText("You cannot " + input[0] + " the " + input[1]);
+          break;
+      }
   }
+  //ROCK//
+  public void forestItemRock(){
+    switch(input[0]){
+        case "examine":
+          if(!hasRockCoin){
+            outputField.setText("it is a rock, you look underneath and find... \n\na gold coin!\nyou take it because it's free money!");
+            inventory.add("coin");
+            hasRockCoin = true;
+          }else{
+            outputField.setText("it is a rock, you look underneath and find... \n\nnothing... \n\nwhat? did you expect more money to be under there?");
+          }
+          break;
+        default:
+          outputField.setText("You cannot " + input[0] + " the " + input[1]);
+          break;
+      }
+  }
+  //SHRUBGUY//
 
+  //forest directions
+  //NORTH//
+  public void forestDirectionNorth(){
+    switch(input[0]){
+        case "go":
+          if(shrubguyEntered && !shrubguyExited){
+              outputField.setText("You cannot pass, as SHRUBGUY blocks your path\n(be careful, he has a knife)");
+            }else if(!shrubguyEntered){
+              outputField.setText("you begin to travel to the north, when you hear someone walking behind you. \nwhen suddenly a shrub jumps in front of you and blocks the path. \nyou realize, that it is not a shrub at all! it is a guy dressed like a shrub. \n\"GREETINGS TRAVELLER!!!!\" the shrub man cries \"IT IS I! THE AMAZING SHRUB-GUY!!!! \nDON'T EVEN THINK ABOUT GOING NORTH!!! AS I WILL STOP YOU!!! A-HAHAHAHAHAH!!!\"");
+              shrubguyEntered = true;
+            }else{
+              
+            }
+          break;
+        default:
+          outputField.setText("You cannot " + input[0] + " " + input[1]);
+          break;
+      }
+  }
+  //SOUTH//
+  public void forestDirectionSouth(){
+    switch(input[0]){
+        case "go":
+            outputField.setText("The forest was too spooky for you, so you retreat to the town.");
+            location = "town";
+          break;
+        default:
+          outputField.setText("You cannot " + input[0] + " " + input[1]);
+          break;
+      }
+  }
 
   // method called when a button is pressed
   public void actionPerformed(ActionEvent e){
@@ -650,8 +749,12 @@ public class Main implements Runnable, ActionListener{
         break;
       case "shop":
         descriptionAdd("a shopkeeper");
-        descriptionAdd("a map");
-        descriptionAdd("a shovel");
+        if(!inventoryContains("map")){
+          descriptionAdd("a map");
+        }
+        if(!inventoryContains("shovel")){
+          descriptionAdd("a shovel");
+        }
         descriptionAdd("a western path leading \nto the town");
         break;
     }
