@@ -590,7 +590,7 @@ public class Main implements Runnable, ActionListener{
             if(!shrubguyEntered && !shrubguyExited){  
               forestItemShrub();
             }else{
-              outputField("it turns out the shrub was actually a guy in disguise... remember?");
+              outputField.setText("it turns out the shrub was actually a guy in disguise... remember?");
             }
             break;
           case "rock":
@@ -604,6 +604,9 @@ public class Main implements Runnable, ActionListener{
             }else{
               outputField.setText("shrub guy ran away... remember?");
             }
+            break;
+          case "goat":
+            forestUseGoat();
             break;
           case "north":
             forestDirectionNorth();
@@ -649,6 +652,41 @@ public class Main implements Runnable, ActionListener{
       }
   }
   //SHRUBGUY//
+  public void forestItemShrubGuy(){
+    switch(input[0]){
+        case "examine":
+          outputField.setText("it is not a shrub at all, just some creep who dresses up like a shrub (it is a nice one, not too expensive)\nto stop any passing travellers.\nonly if there was something i could use to get him to leave.");
+          break;
+        case "talkto":
+          outputField.setText("you ask the SHRUBGUY to let you pass. \nshrubguy yells to you \"OH, SO YOU WANT TO LEAVE??? OK THEN!\" the SHRUBGUY briefly moved out of your way\nbut before you can pass, he returns to his original position and yells to you:\n\"HA HA, YOU THINK I WOULD ACTUALLY LET YOU PASS THAT EASILY!?!?!?\"");
+          break;
+        default:
+          outputField.setText("You cannot " + input[0] + " the " + input[1]);
+          break;
+      }
+  }
+  //inventory items
+  public void forestUseGoat(){
+    switch(input[0]){
+      case "use":
+        if(inventoryContains("goat")){
+            if(shrubguyEntered && !shrubguyExited){
+              outputField.setText("the SHRUBGUY yells to you \"HA HA, YOU FOOL! YOU FELL VICTIM TO ONE OF THE CLASSIC BLUNDERS! \nNEVER GO IN AGAINST A SHRUBGUY WHEN DEATH IS ON THE LINE!!!!\" \nat this point, you are tired of the SHRUBGUY's yelling (although you appreciate the movie quote) and you release your goat, \nit begins to chew on SHRUBGUY's leaves which causes the SHRUBGUY to run away.\n\nthe path is now clear, you can continue through the forest.");
+              shrubguyExited = true;
+            }else if(!shrubguyEntered){
+              outputField.setText("why do you need to release the goat here?");
+            }else{
+              outputField.setText("now that you have gotten rid of the SHRUBGUY, your goat is kinda useless.");
+            }
+        }else{
+          outputField.setText("what goat do you mean?");
+        }
+        break;
+      default:
+        outputField.setText("You cannot " + input[0] + " the " + input[1]);
+        break;
+    }
+  }
 
   //forest directions
   //NORTH//
@@ -658,10 +696,11 @@ public class Main implements Runnable, ActionListener{
           if(shrubguyEntered && !shrubguyExited){
               outputField.setText("You cannot pass, as SHRUBGUY blocks your path\n(be careful, he has a knife)");
             }else if(!shrubguyEntered){
-              outputField.setText("you begin to travel to the north, when you hear someone walking behind you. \nwhen suddenly a shrub jumps in front of you and blocks the path. \nyou realize, that it is not a shrub at all! it is a guy dressed like a shrub. \n\"GREETINGS TRAVELLER!!!!\" the shrub man cries \"IT IS I! THE AMAZING SHRUB-GUY!!!! \nDON'T EVEN THINK ABOUT GOING NORTH!!! AS I WILL STOP YOU!!! A-HAHAHAHAHAH!!!\"");
+              outputField.setText("you begin to travel to the north, when you hear someone walking behind you. \nwhen suddenly a shrub jumps in front of you and blocks the path. \nyou realize, that it is not a shrub at all! it is a guy dressed like a shrub. \n\"GREETINGS TRAVELLER!!!!\" the shrub man cries \"IT IS I! THE AMAZING SHRUB-GUY!!!! \nDO NOT EVEN THINK ABOUT GOING NORTH!!! AS I WILL STOP YOU!!! A-HAHAHAHAHAH!!!\"");
               shrubguyEntered = true;
             }else{
-              
+              outputField.setText("now that SHRUBGUY is gone, you can safely exit the forest.");
+              location = "beach";
             }
           break;
         default:
@@ -756,6 +795,16 @@ public class Main implements Runnable, ActionListener{
           descriptionAdd("a shovel");
         }
         descriptionAdd("a western path leading \nto the town");
+        break;
+      case "forest":
+        descriptionAdd("a rock");
+        if(shrubguyEntered && !shrubguyExited){
+            descriptionAdd("SHRUBGUY!!!");
+          }else if(!shrubguyEntered){
+            descriptionAdd("a shrub");
+          }
+        descriptionAdd("a north path that leads \nout of the forest");
+        descriptionAdd("a south path that leads to \nthe town");
         break;
     }
   }
