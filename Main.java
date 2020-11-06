@@ -13,8 +13,9 @@ public class Main implements Runnable, ActionListener{
 
   JTextArea descriptionDisplay;
   JTextArea inventoryDisplay;
-  //placeholder until my image is made
-  JTextArea mapDisplay;
+  JLabel mapDisplay;
+  ImageIcon mapSmall;
+  ImageIcon mapBig;
 
   Font basicFont;
 
@@ -48,6 +49,9 @@ public class Main implements Runnable, ActionListener{
   boolean boxRevealed = false;
   int oldManConvo = 0;
 
+  //ship
+  boolean chestUnlocked = false;
+
 
   // Method to assemble our GUI
   public void run(){
@@ -72,7 +76,10 @@ public class Main implements Runnable, ActionListener{
 
     descriptionDisplay = new JTextArea("menu description:\n- type \"start\" to begin");
     inventoryDisplay = new JTextArea("inventory:");
-    mapDisplay = new JTextArea();
+    mapDisplay = new JLabel();
+
+    mapSmall = new ImageIcon("map1.png");
+    mapBig = new ImageIcon("map2.png");
 
     basicFont = new Font("MONOSPACED", Font.PLAIN, 12);
 
@@ -87,7 +94,6 @@ public class Main implements Runnable, ActionListener{
     outputField.setEnabled(false);
     inventoryDisplay.setEnabled(false);
     descriptionDisplay.setEnabled(false);
-    mapDisplay.setEnabled(false);
 
     //create an action listener on the input field
     inputField.addActionListener(this);
@@ -97,7 +103,6 @@ public class Main implements Runnable, ActionListener{
     outputField.setFont(basicFont);
     inventoryDisplay.setFont(basicFont);
     descriptionDisplay.setFont(basicFont);
-    mapDisplay.setFont(basicFont);
 
     //add components to the main panel
     mainPanel.add(inputField);
@@ -108,6 +113,9 @@ public class Main implements Runnable, ActionListener{
 
     //add main panel to the frame
     frame.add(mainPanel);
+
+    //add the map image to the map display
+    mapDisplay.setIcon(mapSmall);
 
     //initialize the array list 
     inventory = new ArrayList<>();
@@ -127,18 +135,16 @@ public class Main implements Runnable, ActionListener{
   } 
 
   public void descriptionAdd(String item){
-    //adds one item to the room description (this just looks cleaner than adding this every time)
+    //adds one item to the room description (this just looks cleaner than typing this every time)
     descriptionDisplay.setText(descriptionDisplay.getText() + "\n" + "- " + item);
   }
 
   //location methods:
   // --- MENU --- //
   public void locationMenu(){
-    switch(input[0]){
-      case "start":
-        outputField.setText("You wake up...\nand you're missing...\nyour left sock!\n\nafter panicking for a few minutes, you decide to investigate");
-        location = "room";
-        break;
+    if(input[0].equals("start")){
+      outputField.setText("You wake up...\nand you're missing...\nyour left sock!\n\nafter panicking for a few minutes, you decide to investigate");
+      location = "room";
     }
   }
   // --- ROOM --- //
@@ -155,10 +161,10 @@ public class Main implements Runnable, ActionListener{
           roomItemBed();
           break;
         case "coin":
-          if(!hasDrawerCoin && roomDrawerOpen){
+          if(!hasDrawerCoin && roomDrawerOpen){ //if the drawer is open and you have not gotten the coin yet
             roomItemCoin();
           }else{
-            outputField.setText("you cannot do this");
+            outputField.setText("there is no " + input[1] + " at this location.");
           }
           break;
         case "north":
@@ -260,11 +266,6 @@ public class Main implements Runnable, ActionListener{
   //COIN//
   public void roomItemCoin(){
     switch(input[0]){
-      case "take":
-          outputField.setText("You take the gold coin from the open drawer");
-          inventory.add("coin");
-          hasDrawerCoin = true;
-        break;
       case "get":
         outputField.setText("You take the gold coin from the open drawer");
         inventory.add("coin");
@@ -331,13 +332,13 @@ public class Main implements Runnable, ActionListener{
   public void townItemWell(){
     switch(input[0]){
       case "examine":
-        outputField.setText("there is a bucket lowered in the well with a crank to raise it. \nyou see your reflection in the water...\ngood lookin\' fella.");
+        outputField.setText("there is a bucket lowered in the well with a crank to raise it.\n(type \"use well\" to raise the crank) \nyou see your reflection in the water...\ngood lookin\' fella.");
         break;
       case "use":
-        if(!hasWellCoin){
+        if(!hasWellCoin){ //if you haven't found the well coin
           outputField.setText("you raise the bucket out of the well water. inside you find a gold coin.\nYou take it because it's free money!");
           inventory.add("coin");
-          hasWellCoin = true;
+          hasWellCoin = true; //you found the well coin
         }else{
           outputField.setText("you raise the bucket out of the well water, but there is nothing inside.");
         }
@@ -351,10 +352,10 @@ public class Main implements Runnable, ActionListener{
   public void townItemBarrel(){
     switch(input[0]){
       case "examine":
-        if(!hasBarrelCoin){
+        if(!hasBarrelCoin){ //if you don't have the barrel coin yet
           outputField.setText("it's a barrel full of apples, inside you notice a gold coin.\nyou take it because it's free money!");
           inventory.add("coin");
-          hasBarrelCoin = true;
+          hasBarrelCoin = true; //you found the barrel coin
         }else{
           outputField.setText("it's a barrel full of apples.");
         }
@@ -374,9 +375,9 @@ public class Main implements Runnable, ActionListener{
         outputField.setText("you greet the goat seller, he replies \"Hello there! could I interest you in a goat? only one gold coin each!\"");
         break;
       case "give":
-        if(inventoryContains(input[2])){
-          if(input[2].equals("coin")){
-            if(!inventoryContains("goat")){
+        if(inventoryContains(input[2])){ //if you have the item you're giving
+          if(input[2].equals("coin")){ //if it is a coin
+            if(!inventoryContains("goat")){ //if you haven't bought a goat yet
               outputField.setText("the goat merchant takes your gold coin and says: \"Thanks a bunch pal. I need these to buy another sock. \nmine was stolen last night\"\nhe then gives you the goat you purchased.");
               inventory.remove("coin");
               inventory.add("goat");
@@ -444,7 +445,7 @@ public class Main implements Runnable, ActionListener{
    if(input.length > 1){
       switch(input[1]){
         case "map":
-          if(!inventoryContains("map")){
+          if(!inventoryContains("map")){ //if you don't have the map yet
             shopItemMap();
             break;
           }else{
@@ -452,7 +453,7 @@ public class Main implements Runnable, ActionListener{
           }
           break;
         case "shovel":
-          if(!inventoryContains("shovel")){
+          if(!inventoryContains("shovel")){ //if you don't have the shovel yet
             shopItemShovel();
             break;
           }else{
@@ -482,23 +483,12 @@ public class Main implements Runnable, ActionListener{
           break;
         case "get":
           //if you have enough money 
-          if(shopBalance >= 1){
-            outputField.setText("since you were a good customer and actually paid for it, you can take the map."); 
+          if(shopBalance >= 1){ //if you have at least one coin given to the shopkeeper
+            outputField.setText("since you were a good customer and actually paid for it, you can take the map.\n(also, your minimap has been updated)"); 
             inventory.add("map");
-            shopBalance--; 
+            shopBalance--; //remove one from the shop balance
           }else{
-            outputField.setText("the shopkeeper yells at you for trying to steal the map, he then kicks you out of his shop.");
-            location = "town";
-          }
-          break;
-        case "take":
-          //if you have enough money 
-          if(shopBalance >= 1){
-            outputField.setText("since you were a good customer and actually paid for it, you can take the map."); 
-            inventory.add("map");
-            shopBalance--; 
-          }else{
-            outputField.setText("the shopkeeper yells at you for trying to steal the map, he then kicks you out of his shop.");
+            outputField.setText("the shopkeeper yells at you for trying to steal the map, he then kicks you out of his shop.\n\nYou are now in the town.");
             location = "town";
           }
           break;
@@ -513,25 +503,14 @@ public class Main implements Runnable, ActionListener{
         case "examine":
           outputField.setText("it is a shovel.\n\nhow much description does it need?");
           break;
-        case "get":
+        case "get": //same as "get" and "take" above, now with a shovel
           //if you have enough money 
           if(shopBalance >= 1){
             outputField.setText("since you were a good customer and actually paid for it, you can take the shovel."); 
             inventory.add("shovel");
             shopBalance--; 
           }else{
-            outputField.setText("the shopkeeper yells at you for trying to steal the shovel, he then kicks you out of his shop.");
-            location = "town";
-          }
-          break;
-        case "take":
-          //if you have enough money 
-          if(shopBalance >= 1){
-            outputField.setText("since you were a good customer and actually paid for it, you can take the shovel."); 
-            inventory.add("shovel");
-            shopBalance--; 
-          }else{
-            outputField.setText("the shopkeeper yells at you for trying to steal the shovel, he then kicks you out of his shop.");
+            outputField.setText("the shopkeeper yells at you for trying to steal the shovel, he then kicks you out of his shop.\n\nYou are now in the town.");
             location = "town";
           }
           break;
@@ -550,13 +529,13 @@ public class Main implements Runnable, ActionListener{
         outputField.setText("the shopkeeper says: \"Oho! welcome traveller! to buy things from THIS shop, you give me gold coins and take \nanything you want!");
         break;
       case "give":
-        if(inventoryContains(input[2])){
-          if(input[2].equals("coin")){
-            if(coinsGiven < 2){
+        if(inventoryContains(input[2])){//if you have what you are trying to give
+          if(input[2].equals("coin")){ //if it is a coin
+            if(coinsGiven < 2){ //if you haven't given him a total of 2 coins yet (to make sure they can buy the goat)
               outputField.setText("the shopkepper takes your gold coin and says: \"Ok! now ya can take one item from the shop.\"");
               inventory.remove("coin");
-              shopBalance += 1;
-              coinsGiven += 1;
+              shopBalance += 1; //add one to how much the player can take
+              coinsGiven += 1; //add one to total money given to the shopkeeper
             }else{
               outputField.setText("you've given the shopkeeper enough money by now. You don't want to spend it all in one place, do you?");
             }
@@ -591,23 +570,20 @@ public class Main implements Runnable, ActionListener{
     if(input.length > 1){
         switch(input[1]){
           case "shrub":
-            if(!shrubguyEntered && !shrubguyExited){  
+            if(!shrubguyEntered && !shrubguyExited){  //if you have not yet met the SHRUBGUY
               forestItemShrub();
-            }else{
-              outputField.setText("it turns out the shrub was actually a guy in disguise... remember?");
+            }else{ //if SHRUBGUY has been revealed
+              outputField.setText("there is no " + input[1] + " at this location.");
             }
             break;
           case "rock":
             forestItemRock();
             break;
-          case "shrubguy":
-            if(shrubguyEntered && !shrubguyExited){
+          case "shrubguy": 
+            if(shrubguyEntered && !shrubguyExited){ //if shrubguy exists
               forestItemShrubGuy();
-            }else if(!shrubguyEntered){
+            }else{ //if shrub guy does not exist
               outputField.setText("there is no " + input[1] + " at this location.");
-            }else{
-              outputField.setText("shrub guy ran away... remember?");
-            }
             break;
           case "goat":
             forestUseGoat();
@@ -630,30 +606,30 @@ public class Main implements Runnable, ActionListener{
   //SHRUB//
   public void forestItemShrub(){
     switch(input[0]){
-        case "examine":
+        case "examine": //monty python reference #1
           outputField.setText("it is a shrub (it is one that looks nice, and it's not too expensive).\n\nyou reach in to see if there is anything inside... and you hear someone say: \"ow\".");
           break;
         default:
           outputField.setText("You cannot " + input[0] + " the " + input[1]);
           break;
-      }
+    }
   }
   //ROCK//
   public void forestItemRock(){
     switch(input[0]){
-        case "examine":
-          if(!hasRockCoin){
-            outputField.setText("it is a rock, you look underneath and find... \n\na gold coin!\nyou take it because it's free money!");
-            inventory.add("coin");
-            hasRockCoin = true;
-          }else{
-            outputField.setText("it is a rock, you look underneath and find... \n\nnothing... \n\nwhat? did you expect more money to be under there?");
-          }
-          break;
-        default:
-          outputField.setText("You cannot " + input[0] + " the " + input[1]);
-          break;
-      }
+      case "examine":
+        if(!hasRockCoin){ //if the player hasn't taken a rock coin yet
+          outputField.setText("it is a rock, you look underneath and find... \n\na gold coin!\nyou take it because it's free money!");
+          inventory.add("coin");
+          hasRockCoin = true;
+        }else{
+          outputField.setText("it is a rock, you look underneath and find... \n\nnothing... \n\nwhat? did you expect more money to be under there?");
+        }
+        break;
+      default:
+        outputField.setText("You cannot " + input[0] + " the " + input[1]);
+        break;
+    }
   }
   //SHRUBGUY//
   public void forestItemShrubGuy(){
@@ -674,11 +650,11 @@ public class Main implements Runnable, ActionListener{
     switch(input[0]){
       case "use":
         if(inventoryContains("goat")){
-            if(shrubguyEntered && !shrubguyExited){
+            if(shrubguyEntered && !shrubguyExited){ //if shrub guy exists
               outputField.setText("the SHRUBGUY yells to you \"HA HA, YOU FOOL! YOU FELL VICTIM TO ONE OF THE CLASSIC BLUNDERS! \nNEVER GO IN AGAINST A SHRUBGUY WHEN DEATH IS ON THE LINE!!!!\" \nat this point, you are tired of the SHRUBGUY's yelling (although you appreciate the movie quote) and you \nrelease your goat, it begins to chew on SHRUBGUY's leaves which causes the SHRUBGUY to run away.\n\nthe path is now clear, you can continue through the forest.");
-              shrubguyExited = true;
+              shrubguyExited = true; //make shrubguy leave
             }else if(!shrubguyEntered){
-              outputField.setText("why do you need to release the goat here?");
+              outputField.setText("why do you need to release the goat here?"); 
             }else{
               outputField.setText("now that you have gotten rid of the SHRUBGUY, your goat is kinda useless.");
             }
@@ -697,13 +673,13 @@ public class Main implements Runnable, ActionListener{
   public void forestDirectionNorth(){
     switch(input[0]){
         case "go":
-          if(shrubguyEntered && !shrubguyExited){
+          if(shrubguyEntered && !shrubguyExited){ //if shrubguy is blocking you
               outputField.setText("You cannot pass, as SHRUBGUY blocks your path\n(be careful, he has a knife)");
-            }else if(!shrubguyEntered){
+            }else if(!shrubguyEntered){ //if you haven't seen shrub guy yet
               outputField.setText("you begin to travel to the north, when you hear someone walking behind you. \nwhen suddenly a shrub jumps in front of you and blocks the path. \nyou realize, that it is not a shrub at all! it is a guy dressed like a shrub. \n\"GREETINGS TRAVELLER!!!!\" the shrub man cries \"IT IS I! THE AMAZING SHRUB-GUY!!!! \nDO NOT EVEN THINK ABOUT GOING NORTH!!! AS I WILL STOP YOU!!! A-HAHAHAHAHAH!!!\"");
-              shrubguyEntered = true;
-            }else{
-              outputField.setText("now that SHRUBGUY is gone, you can safely exit the forest.");
+              shrubguyEntered = true; //make shrubguy come to stop you
+            }else{ //otherwise, you can pass
+              outputField.setText("now that SHRUBGUY is gone, you can safely exit the forest. \nyou follow the long path until you arrive on the beach");
               location = "beach";
             }
           break;
@@ -727,8 +703,8 @@ public class Main implements Runnable, ActionListener{
 
   // --- BEACH --- //
   public void locationBeach(){
-    if(oldManConvo > 0){ //if the player is in the old man conversation
-      switch(oldManConvo){
+    if(oldManConvo > 0){ //if the player is in the old man conversation (this is first increased when talking to the old man) this is so that their inputs only effect the old man conversation and not anything else
+      switch(oldManConvo){ //monty python reference #2
         case 1:
           outputField.setText("You tell the old man that your name is " + pureInput + ".\n\nthe old man says: \"What... is your Quest?\"");
           oldManConvo++; //go to the next question
@@ -749,7 +725,7 @@ public class Main implements Runnable, ActionListener{
             beachItemOldman();
             break;
           case "box":
-            if(boxRevealed){
+            if(boxRevealed){ //if you have dug up the box
               beachItemBox();
             }else{
               outputField.setText("there is no " + input[1] + " at this location.");
@@ -785,7 +761,7 @@ public class Main implements Runnable, ActionListener{
         break;
       case "talkto":
         outputField.setText("\"Stop! Who would cross this Beach must answer me these questions three, ere the other side he see.\"\nyou ask the old man what the first question is,\nthe man mumbles: \"What... is your name?\"");
-        oldManConvo++; //add 1 to question counter (starts the first question)
+        oldManConvo++; //add 1 to question counter (starts the conversation with the old man *before action check)
         break;
       default:
         outputField.setText("You cannot " + input[0] + " the " + input[1]);
@@ -796,15 +772,15 @@ public class Main implements Runnable, ActionListener{
   public void beachItemBox(){
     switch(input[0]){
       case "examine":
-        if(!inventoryContains("key")){
+        if(!inventoryContains("key")){ //if you don't have the key yet
           outputField.setText("it is a small cardboard box that you dug up on the beach. inside there is a small key. \nyou decide to take it");
-          inventory.add("key");
+          inventory.add("key"); //give the user the key
         }else{
           outputField.setText("it is a small cardboard box that you dug up on the beach.\nit is empty.");
         }
         break;
-      case "open":
-        if(!inventoryContains("key")){
+      case "open": //this is the same as examine, just different wording
+        if(!inventoryContains("key")){ 
           outputField.setText("inside the box there is a small key. \nyou decide to take it");
           inventory.add("key");
         }else{
@@ -821,10 +797,10 @@ public class Main implements Runnable, ActionListener{
   public void beachUseShovel(){
     switch(input[0]){
       case "use":
-        if(inventoryContains("shovel")){
-          if(!boxRevealed){
+        if(inventoryContains("shovel")){ //if you have the shovel
+          if(!boxRevealed){ //if you haven't dug up the beach yet
             outputField.setText("You start digging around the beach until you find a box buried underground.");
-            boxRevealed = true;
+            boxRevealed = true; //make the box exist
           }else{
             outputField.setText("You've already dug holes through the entire beach, you probably shouldn't dig anymore.");
           }
@@ -842,7 +818,7 @@ public class Main implements Runnable, ActionListener{
   public void beachDirectionNorth(){
     switch(input[0]){
         case "go":
-            outputField.setText("");
+            outputField.setText("you notice a ship docked at the beach, you decide to board it.");
             location = "pirateShip";
           break;
         default:
@@ -854,7 +830,7 @@ public class Main implements Runnable, ActionListener{
   public void beachDirectionEast(){
     switch(input[0]){
         case "go":
-            outputField.setText("");
+            outputField.setText("you continue along the beach until you arrive at a cave, it smells real bad inside.");
             location = "cave";
           break;
         default:
@@ -868,6 +844,194 @@ public class Main implements Runnable, ActionListener{
         case "go":
             outputField.setText("You travel to the west until you reach the forest.");
             location = "forest";
+          break;
+        default:
+          outputField.setText("You cannot " + input[0] + " " + input[1]);
+          break;
+      }
+  }
+  // --- PIRATE SHIP --- //
+  public void locationPirateShip(){
+    if(input.length > 1){
+      switch(input[1]){
+        case "pirate":
+          shipItemPirate();
+          break;
+        case "chest":
+          shipItemChest();
+          break;
+        case "key":
+          shipUseKey();
+          break;
+        case "south":
+          shipDirectionSouth();
+          break;
+        default:
+          outputField.setText("there is no " + input[1] + " at this location.");
+          break;
+        }
+    }else{
+        outputField.setText("unknown command, try typing \"help\" for a list of commands");
+    }
+  }
+  
+  //pirate ship items
+  //PIRATE//
+  public void shipItemPirate(){
+    switch(input[0]){
+      case "examine":
+        outputField.setText("it is a sad-looking pirate, he doesn't look hostile.\nmaybe you should talk to him."); 
+        break;
+      case "talkto":
+        outputField.setText("\"Ahoy Matey, I 'ave gotten meself in a bit of a pickle. \nI 'ave mistakenly buried the key to me treasure chest under the beach to the south of 'ere.\nwould you do a favour fer me lad, and 'elp me find it?\"");
+        break;
+      default:
+        outputField.setText("You cannot " + input[0] + " the " + input[1]);
+        break;
+    }
+  }
+  //CHEST//
+  public void shipItemChest(){
+    switch(input[0]){
+      case "examine":
+        if(!chestUnlocked){ //if the chest is locked
+          outputField.setText("it is a chest belonging to the pirate, it is locked");
+        }else{
+          if(!inventoryContains("segway")){ //if you haven't gotten the segway yet
+            outputField.setText("you open the now-unlocked chest.\ninside you find....\na segway?\n\nthe pirate is just as surprised as you are.\n\n\"That ain't me treasure!?! well I 'ave no use fer a segway! you can keep it young lad.\"\n\nyou take the segway.");
+            inventory.add("segway"); //give the user the segway
+          }else{
+            outputField.setText("the chest is empty.");
+          }
+        }
+        break;
+      default:
+        outputField.setText("You cannot " + input[0] + " the " + input[1]);
+        break;
+    }
+  }
+  //inventory items
+  //KEY//
+  public void shipUseKey(){
+    switch(input[0]){
+      case "use":
+        if(inventoryContains("key")){ //if you have the key
+          if(!chestUnlocked){ //if you have not unlocked the chest
+            outputField.setText("You unlock the chest with the small key, now examine it to see what's inside!.");
+            chestUnlocked = true; //unlock the chest
+          }else{
+            outputField.setText("You've already unlocked the chest, there is no need to unlock it again.");
+          }
+        }else{
+          outputField.setText("what key do you mean?");
+        }
+        break;
+      default:
+        outputField.setText("You cannot " + input[0] + " the " + input[1]);
+        break;
+    }
+  }
+  //pirate ship directions
+  //SOUTH//
+  public void shipDirectionSouth(){
+    switch(input[0]){
+        case "go":
+            outputField.setText("You leave the pirate ship and return to the beach");
+            location = "beach";
+          break;
+        default:
+          outputField.setText("You cannot " + input[0] + " " + input[1]);
+          break;
+      }
+  }
+
+  /// --- Cave --- ///
+  public void locationCave(){
+    if(input.length > 1){
+      switch(input[1]){
+        case "peglegman":
+          caveItemPeglegman();
+          break;
+        case "socks":
+          caveItemSocks();
+          break;
+        case "diary":
+          caveItemDiary();
+          break;
+        case "west":
+          caveDirectionWest();
+          break;
+        default:
+          outputField.setText("there is no " + input[1] + " at this location.");
+          break;
+      }
+    }else{
+      outputField.setText("unknown command, try typing \"help\" for a list of commands");
+    }
+  }
+  //cave items
+  //PEG LEG MAN//
+  public void caveItemPeglegman(){
+    switch(input[0]){
+      case "examine":
+        outputField.setText("The peg-legged man is very large, he sits alone in the cave looking very menacing.");
+        break;
+      case "talkto":
+        outputField.setText("you ask the man if you could have your sock back, \"NO!\" the man cries \"If I can't wear two socks NO ONE CAN! \nthat's why I stole everyone's left sock. \nNOW SCRAM!!!!\"\nyou decide to stop talking to the man now.");
+        break;
+      case "give":
+        if(inventoryContains(input[2])){ //if you have the item you are trying to give
+          if(input[2].equals("segway")){ //if you are giveng the segway
+            outputField.setText("\"what is this? a segway? finally, my one true dream of riding a segway \nhas been fulfilled. Thank you! in return I will give you your left sock back!\"\n...\n...\n\nfinally, you have obtained your left sock! you return home with two socks... and relax.");
+            inventory.clear();
+            inventory.add("sock"); //give the player their final reward
+            location = "end"; //end the game
+          }else{
+            outputField.setText("the man tells you: \"WHAT IS THIS?! are you trying to bribe me with " + input[2] + "!?! \nNO! I will not accept it!\"");
+          }
+        }else{
+          outputField.setText("you can't give something you don't have!");
+        }
+        break;
+      default:
+        outputField.setText("You cannot " + input[0] + " the " + input[1]);
+        break;
+    }
+  }
+  //SOCKS//
+  public void caveItemSocks(){
+    switch(input[0]){
+      case "examine":
+        outputField.setText("it is a pile of everyone's left socks, maybe the peg-legged man took them!");
+        break;
+      case "get":
+        outputField.setText("you try to grab a sock from the pile, but the peg-legged man stops you\n and says: \"NO! IF I CAN'T WEAR TWO SOCKS, NO ONE CAN!!\"");
+        break;
+      default:
+        outputField.setText("You cannot " + input[0] + " the " + input[1]);
+        break;
+    }
+  }
+
+  //DIARY//
+  public void caveItemDiary(){
+    switch(input[0]){
+        case "examine":
+          outputField.setText("you read an entry in the peg-legged man's diary:\n\n\"I hate my peg-leg, only if I had some sort of motorized vehicle so that I could get around easier.\""); //hint: IT'S THE SEGWAY!!!
+          break;
+        default:
+          outputField.setText("You cannot " + input[0] + " the " + input[1]);
+          break;
+    }
+  }
+
+  //cave directions
+  //WEST//
+  public void caveDirectionWest(){
+    switch(input[0]){
+        case "go":
+            outputField.setText("You leave the cave, and return to the beach");
+            location = "beach";
           break;
         default:
           outputField.setText("You cannot " + input[0] + " " + input[1]);
@@ -889,8 +1053,7 @@ public class Main implements Runnable, ActionListener{
 
     //check if the user wants a list of commands
     if(input[0].equals("help")){
-      outputField.setText("COMMANDS:\n-examine: get a further description of an object\n-use: interact with a given object or inventory item\n-get/take: puts the given object in your inventory\n-go: sends you to the given location\n-open/close: opens or closes the given object\n-talkto: talks to the given person\n-give (target) (item): gives the specified person the specified object\n-eat: eats the specified target");
-    }else{
+      outputField.setText("COMMANDS:\n-examine: get a further description of an object\n-use: interact with a given object or inventory item\n-get: puts the given object in your inventory\n-go: sends you to the given location\n-open/close: opens or closes the given object\n-talkto: talks to the given person\n-give (target) (item): gives the specified person the specified object\n-eat: eats the specified target");
         //go to the method based on the player's location
         switch(location){
           case "menu":
@@ -911,66 +1074,92 @@ public class Main implements Runnable, ActionListener{
           case "beach":
             locationBeach();
             break;
+          case "pirateShip":
+            locationPirateShip();
+            break;
+          case "cave":
+            locationCave();
+            break;
+          case "end":
+            outputField.setText("####### #     # #######    ####### #     # ######  ###\n   #    #     # #          #       ##    # #     # ###\n   #    #     # #          #       # #   # #     # ###\n   #    ####### #####      #####   #  #  # #     #  # \n   #    #     # #          #       #   # # #     #    \n   #    #     # #          #       #    ## #     # ###\n   #    #     # #######    ####### #     # ######  ### ");
+            break;
         }
     }
 
     //update the inventory display
     inventoryDisplay.setText("inventory:");
-    for(int i = 0; i < inventory.size(); i++){
-      inventoryDisplay.setText(inventoryDisplay.getText() + "\n" + inventory.get(i));
+    for(int i = 0; i < inventory.size(); i++){ //repeat for every item in the inventory
+      inventoryDisplay.setText(inventoryDisplay.getText() + "\n" + inventory.get(i)); //add the next part of the inventory to the display 
     }
-    //update the room description
+    //update the map display
+    if(inventoryContains("map")){ //if they bought the better map
+      mapDisplay.setIcon(mapBig); //show the full map
+    }else{ //otherwise
+      mapDisplay.setIcon(mapSmall); //show the small map
+    }
+    //update the room description (show the items that can be interacted with)
     descriptionDisplay.setText(location + " description:");
     switch(location){
       case "menu":
         descriptionAdd("type \"start\" to begin");
         break;
       case "room":
-        descriptionAdd("a bed");
-        descriptionAdd("a chest of drawers");
-        descriptionAdd("a front door");
-        descriptionAdd("a town to the north");
+        descriptionAdd("bed");
+        descriptionAdd("drawer");
+        descriptionAdd("door");
+        descriptionAdd("north");
         //if the coin is available
         if(roomDrawerOpen && !hasDrawerCoin){
-          descriptionAdd("a coin");
+          descriptionAdd("coin");
         }
         break;
       case "town":
-        descriptionAdd("an old well");
-        descriptionAdd("some barrels of fruit");
-        descriptionAdd("a goat merchant");
-        descriptionAdd("a store to the east");
-        descriptionAdd("woods to the north");
-        descriptionAdd("your home to the south");
+        descriptionAdd("well");
+        descriptionAdd("barrel");
+        descriptionAdd("merchant");
+        descriptionAdd("east");
+        descriptionAdd("north");
+        descriptionAdd("south");
         break;
       case "shop":
-        descriptionAdd("a shopkeeper");
-        if(!inventoryContains("map")){
-          descriptionAdd("a map");
+        descriptionAdd("shopkeeper");
+        if(!inventoryContains("map")){ //if you haven't bought the map
+          descriptionAdd("map");
         }
-        if(!inventoryContains("shovel")){
-          descriptionAdd("a shovel");
+        if(!inventoryContains("shovel")){ //if you haven't bought the shovel
+          descriptionAdd("shovel");
         }
-        descriptionAdd("a western path leading \nto the town");
+        descriptionAdd("west");
         break;
       case "forest":
-        descriptionAdd("a rock");
-        if(shrubguyEntered && !shrubguyExited){
-            descriptionAdd("SHRUBGUY!!!");
-          }else if(!shrubguyEntered){
-            descriptionAdd("a shrub");
+        descriptionAdd("rock");
+        if(shrubguyEntered && !shrubguyExited){ //if shrubguy is there
+            descriptionAdd("shrubguy");
+          }else if(!shrubguyEntered){ //if he is still a shrub
+            descriptionAdd("shrub");
           }
-        descriptionAdd("a north path that leads \nout of the forest");
-        descriptionAdd("a south path that leads to \nthe town");
+        descriptionAdd("north");
+        descriptionAdd("south");
         break;
       case "beach":
-        descriptionAdd("an old man");
-        if(boxRevealed){
-          descriptionAdd("a box");
+        descriptionAdd("oldman");
+        if(boxRevealed){ //if you dug up the box
+          descriptionAdd("box");
         }
-        descriptionAdd("a pirate ship to the north");
-        descriptionAdd("a cave to the east");
-        descriptionAdd("a forest to the west");
+        descriptionAdd("north");
+        descriptionAdd("east");
+        descriptionAdd("west");
+        break;
+      case "pirateShip":
+        descriptionAdd("pirate");
+        descriptionAdd("chest");
+        descriptionAdd("south");
+        break;
+      case "cave":
+        descriptionAdd("peglegman");
+        descriptionAdd("socks");
+        descriptionAdd("diary");
+        descriptionAdd("west");
         break;
     }
   }
