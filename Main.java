@@ -142,7 +142,7 @@ public class Main implements Runnable, ActionListener{
   //location methods:
   // --- MENU --- //
   public void locationMenu(){
-    if(input[0].equals("start")){
+    if(pureInput.equals("start")){
       outputField.setText("You wake up...\nand you're missing...\nyour left sock!\n\nafter panicking for a few minutes, you decide to investigate");
       location = "room";
     }
@@ -584,6 +584,7 @@ public class Main implements Runnable, ActionListener{
               forestItemShrubGuy();
             }else{ //if shrub guy does not exist
               outputField.setText("there is no " + input[1] + " at this location.");
+            }
             break;
           case "goat":
             forestUseGoat();
@@ -1052,37 +1053,38 @@ public class Main implements Runnable, ActionListener{
     inputField.setText("");
 
     //check if the user wants a list of commands
-    if(input[0].equals("help")){
+    if(pureInput.equals("help")){
       outputField.setText("COMMANDS:\n-examine: get a further description of an object\n-use: interact with a given object or inventory item\n-get: puts the given object in your inventory\n-go: sends you to the given location\n-open/close: opens or closes the given object\n-talkto: talks to the given person\n-give (target) (item): gives the specified person the specified object\n-eat: eats the specified target");
-        //go to the method based on the player's location
-        switch(location){
-          case "menu":
-            locationMenu();
-            break;
-          case "room":
-            locationRoom();
-            break;
-          case "town":
-            locationTown();
-            break;
-          case "shop":
-            locationShop();
-            break;
-          case "forest":
-            locationForest();
-            break;
-          case "beach":
-            locationBeach();
-            break;
-          case "pirateShip":
-            locationPirateShip();
-            break;
-          case "cave":
-            locationCave();
-            break;
-          case "end":
-            outputField.setText("####### #     # #######    ####### #     # ######  ###\n   #    #     # #          #       ##    # #     # ###\n   #    #     # #          #       # #   # #     # ###\n   #    ####### #####      #####   #  #  # #     #  # \n   #    #     # #          #       #   # # #     #    \n   #    #     # #          #       #    ## #     # ###\n   #    #     # #######    ####### #     # ######  ### ");
-            break;
+    }else{
+      //go to the method based on the player's location
+      switch(location){
+        case "menu":
+          locationMenu();
+          break;
+        case "room":
+          locationRoom();
+          break;
+        case "town":
+          locationTown();
+          break;
+        case "shop":
+          locationShop();
+          break;
+        case "forest":
+          locationForest();
+          break;
+        case "beach":
+          locationBeach();
+          break;
+        case "pirateShip":
+          locationPirateShip();
+          break;
+        case "cave":
+          locationCave();
+          break;
+        case "end":
+          outputField.setText("####### #     # #######    ####### #     # ######  ###\n   #    #     # #          #       ##    # #     # ###\n   #    #     # #          #       # #   # #     # ###\n   #    ####### #####      #####   #  #  # #     #  # \n   #    #     # #          #       #   # # #     #    \n   #    #     # #          #       #    ## #     # ###\n   #    #     # #######    ####### #     # ######  ### ");
+          break;
         }
     }
 
